@@ -1,0 +1,26 @@
+export const BRAND_CONTENT = {
+  title: "Brand Management",
+  subtitle: "Create and manage the shared brand master.",
+  form: {
+    createTitle: "Add Brand",
+    editTitle: "Edit Brand",
+    name: { label: "Brand Name", placeholder: "e.g. Velvet Beauty" },
+    create: "Add Brand",
+    update: "Update Brand",
+    saving: "Saving...",
+    cancel: "Cancel",
+    createdMsg: "Brand created successfully.",
+    updatedMsg: "Brand updated successfully.",
+  },
+  list: {
+    title: "Brand List",
+    searchPlaceholder: "Search brand",
+    search: "Search",
+    reset: "Reset",
+    columns: ["Name", "Status", "Actions"],
+    empty: "No brands found.",
+    edit: "Edit",
+    deactivate: "Deactivate",
+    confirm: "Deactivate this brand?",
+  },
+};

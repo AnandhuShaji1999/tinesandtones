@@ -1,0 +1,27 @@
+export const ROUTES = {
+  ROOT: "/",
+  LOGIN: "/login",
+  DASHBOARD: "/dashboard",
+  REPORTS: "/reports",
+  BILLING: "/billing",
+  EXCHANGES: "/exchanges",
+  PRODUCTS: "/products",
+  ADD_PRODUCT: "/products/new",
+  VARIANTS: "/variants",
+  SUPPLIERS: "/suppliers",
+  PURCHASES: "/purchases",
+  ADD_PURCHASE: "/purchases/new",
+  EDIT_PURCHASE: "/purchases/:id/edit",
+  STOCK: "/stock",
+  STOCK_AUDITS: "/stock-audits",
+  CATEGORIES: "/categories",
+  BRANDS: "/brands",
+  EMPLOYEES: "/employees",
+  CUSTOMERS: "/customers",
+  SALES: "/sales",
+  MESSAGES: "/messages",
+  SETTINGS: "/settings",
+  SYSTEM: "/system",
+};
+
+export const editPurchasePath = (id) => `/purchases/${id}/edit`;

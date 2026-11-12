@@ -1,0 +1,45 @@
+import {
+  ChartPie,
+  FileText,
+  Receipt,
+  Repeat,
+  ChartNoAxesColumn,
+  Layers,
+  Truck,
+  ReceiptText,
+  Boxes,
+  ClipboardCheck,
+  Tags,
+  Award,
+  ShoppingCart,
+  ShoppingBag,
+  ChartLine,
+  MessageSquareMore,
+  Settings,
+  Activity,
+  LogOut,
+} from "lucide-react";
+import { ROUTES } from "../constants/routes";
+
+export const NAV_ITEMS = [
+  { label: "Dashboard", title: "Dashboard", path: ROUTES.DASHBOARD, icon: ChartPie },
+  { label: "Reports", title: "Reports", path: ROUTES.REPORTS, icon: FileText },
+  { label: "Billing", title: "POS Billing", path: ROUTES.BILLING, icon: Receipt },
+  { label: "Exchanges", title: "Exchanges", path: ROUTES.EXCHANGES, icon: Repeat },
+  { label: "Product Mangement", title: "Product Database", path: ROUTES.PRODUCTS, icon: ChartNoAxesColumn },
+  { label: "Variants", title: "Variant Database", path: ROUTES.VARIANTS, icon: Layers },
+  { label: "Suppliers", title: "Supplier Database", path: ROUTES.SUPPLIERS, icon: Truck },
+  { label: "Purchases", title: "Purchase Database", path: ROUTES.PURCHASES, icon: ReceiptText },
+  { label: "Stock", title: "Stock Audit List", path: ROUTES.STOCK, icon: Boxes },
+  { label: "Stock Audits", title: "Stock Audits", path: ROUTES.STOCK_AUDITS, icon: ClipboardCheck },
+  { label: "Categories", title: "Category Database", path: ROUTES.CATEGORIES, icon: Tags },
+  { label: "Brands", title: "Brand Database", path: ROUTES.BRANDS, icon: Award },
+  { label: "Employee Mangement", title: "Staff Database", path: ROUTES.EMPLOYEES, icon: ShoppingCart },
+  { label: "Customers", title: "Customer Database", path: ROUTES.CUSTOMERS, icon: ShoppingBag },
+  { label: "Sales Management", title: "Sales Database", path: ROUTES.SALES, icon: ChartLine },
+  { label: "Messages", title: "Messages", path: ROUTES.MESSAGES, icon: MessageSquareMore },
+  { label: "Settings", title: "Settings", path: ROUTES.SETTINGS, icon: Settings },
+  { label: "System Status", title: "System Status", path: ROUTES.SYSTEM, icon: Activity },
+];
+
+export const SIGN_OUT = { label: "Sign Out", icon: LogOut };

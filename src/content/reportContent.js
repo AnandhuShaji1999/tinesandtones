@@ -1,0 +1,20 @@
+export const REPORT_CONTENT = {
+  title: "Reports",
+  filters: {
+    title: "Filters",
+    branch: "BRANCH",
+    allBranches: "All Branches",
+    branchId: "Branch ID",
+    from: "FROM DATE",
+    to: "TO DATE",
+    search: "SEARCH (THIS PAGE)",
+    searchPh: "Search rows...",
+    reset: "Reset",
+    apply: "Apply",
+    csv: "Export CSV",
+    xlsx: "Export XLSX",
+    exporting: "Exporting...",
+  },
+  note: "Stock quantities are current values, even when a date range is chosen.",
+  empty: "No records found.",
+};

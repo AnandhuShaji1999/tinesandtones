@@ -1,0 +1,31 @@
+export const STOCK_CONTENT = {
+  title: "Stock Audit List",
+  tabs: {
+    balances: "Branch Balances",
+    batches: "Batches",
+    ledger: "Ledger",
+  },
+  filters: {
+    title: "Advanced Filters",
+    branch: "BRANCH",
+    allBranches: "All Branches",
+    branchId: "Branch ID",
+    variant: "VARIANT",
+    allVariants: "All Variants",
+    purchase: "PURCHASE ID",
+    purchasePh: "e.g. 12",
+    search: "SEARCH (THIS PAGE)",
+    searchPh: "Search rows...",
+    reset: "Reset",
+    export: "Export",
+    submit: "Search",
+  },
+  stats: {
+    records: "TOTAL RECORDS",
+    units: "TOTAL QUANTITY (THIS PAGE)",
+    zero: "ZERO QUANTITY (THIS PAGE)",
+  },
+  empty: "No stock records found.",
+  actions: "ACTION",
+  detail: { title: "Stock Details", close: "Close" },
+};
