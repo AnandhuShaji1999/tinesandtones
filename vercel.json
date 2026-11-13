@@ -1,8 +1,7 @@
 {
   "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/:path*", "destination": "/api/proxy?path=api/:path*" },
+    { "source": "/health/:path*", "destination": "/api/proxy?path=health/:path*" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
