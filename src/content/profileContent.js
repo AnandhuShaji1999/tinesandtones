@@ -1,0 +1,32 @@
+export const PROFILE_CONTENT = {
+  title: "My Profile",
+  subtitle: "Your account details and branch access.",
+  account: {
+    title: "Account",
+    name: "Full Name",
+    email: "Email",
+    status: "Status",
+    active: "Active",
+    inactive: "Inactive",
+    joined: "Member Since",
+    type: "Account Type",
+    admin: "Business Admin",
+    staff: "Staff",
+  },
+  branches: {
+    title: "Branch Access",
+    columns: ["BRANCH", "ROLE"],
+    empty: "No branch assigned. Ask the business admin to assign you to a branch.",
+  },
+  password: {
+    title: "Change Password",
+    current: "Current Password",
+    next: "New Password",
+    confirm: "Confirm New Password",
+    hint: "At least 8 characters.",
+    submit: "Update Password",
+    saving: "Saving...",
+    done: "Password updated successfully.",
+  },
+  signOut: "Sign Out",
+};

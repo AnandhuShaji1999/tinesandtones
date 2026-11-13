@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./views/Login/Login";
 import Dashboard from "./views/Dashboard/Dashboard";
+import Profile from "./views/Profile/Profile";
 import Reports from "./views/Reports/Reports";
 import Billing from "./views/Billing/Billing";
 import Exchanges from "./views/Exchanges/Exchanges";
@@ -28,6 +29,7 @@ const App = () => (
 
     <Route element={<DashboardLayout />}>
       <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+      <Route path={ROUTES.PROFILE} element={<Profile />} />
       <Route path={ROUTES.REPORTS} element={<Reports />} />
       <Route path={ROUTES.BILLING} element={<Billing />} />
       <Route path={ROUTES.EXCHANGES} element={<Exchanges />} />

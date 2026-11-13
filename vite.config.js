@@ -1,13 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-const target = "https://unshored-esoterically-damon.ngrok-free.dev";
+const target = "http://34.136.24.159";
 
 const proxyOptions = {
   target,
   changeOrigin: true,
-  secure: true,
-  headers: { "ngrok-skip-browser-warning": "true" },
+  secure: false,
 };
 
 export default defineConfig({
