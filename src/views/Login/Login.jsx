@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   Headset,
 } from "lucide-react";
-import { LOGIN_CONTENT, BRANCHES, CASHIER_ACCOUNTS } from "../../content/loginContent";
+import { LOGIN_CONTENT, BRANCHES } from "../../content/loginContent";
 import { login } from "../../controllers/authController";
 import { ROUTES } from "../../constants/routes";
 
@@ -166,28 +166,6 @@ const Login = () => {
               {!loading && <ArrowRight size={17} />}
             </button>
           </form>
-
-          <div className="accounts-divider">
-            <span>{c.accountsLabel}</span>
-          </div>
-          <div className="accounts">
-            {CASHIER_ACCOUNTS.map((a) => (
-              <button
-                type="button"
-                key={a.username}
-                className="account"
-                onClick={() => setForm((p) => ({ ...p, username: a.username }))}
-              >
-                <span className={`avatar ${a.active ? "avatar-active" : ""}`}>
-                  {a.initials}
-                </span>
-                <span className="account-info">
-                  <strong>{a.name}</strong>
-                  <em className={a.active ? "meta-active" : ""}>{a.meta}</em>
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
 
         <p className="secure-note">

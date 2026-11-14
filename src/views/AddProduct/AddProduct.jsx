@@ -214,7 +214,7 @@ const AddProduct = () => {
 
           <div className="ap-field">
             <label>{c.details.expiry.label}</label>
-            <label className="ap-check">
+            <label className="ap-check ap-check-box">
               <input
                 type="checkbox"
                 name="expiryTracked"

@@ -18,7 +18,6 @@ export const LOGIN_CONTENT = {
   rememberStation: "Remember this POS station",
   quickPin: "Quick PIN Entry",
   submit: "Sign In to POS Register",
-  accountsLabel: "REGISTERED CASHIER ACCOUNTS",
   secure: "End-to-End Encrypted Retail POS Station",
   footer: {
     copyright:
@@ -29,21 +28,4 @@ export const LOGIN_CONTENT = {
 
 export const BRANCHES = [
   { value: "main", label: "Main Branch (HQ) – Flagship Suite" },
-];
-
-export const CASHIER_ACCOUNTS = [
-  {
-    initials: "AM",
-    name: "AM (Store Mgr)",
-    meta: "Shift Active",
-    active: true,
-    username: "am_storemanager",
-  },
-  {
-    initials: "PS",
-    name: "Priya Sharma",
-    meta: "Counter #2",
-    active: false,
-    username: "priya_sharma",
-  },
 ];
