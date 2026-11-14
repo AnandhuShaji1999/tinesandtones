@@ -11,12 +11,22 @@ import { listProductOptions } from "../../controllers/productController";
 
 const EMPTY = {
   product: "",
-  sku: "",
   barcode: "",
   shade: "",
   size: "",
   color: "",
 };
+
+// SKU column removed (the barcode is shown instead)
+const COLUMNS = [
+  "Barcode",
+  "Product",
+  "Shade",
+  "Size",
+  "Color",
+  "Status",
+  "Actions",
+];
 
 const Variants = () => {
   const c = VARIANT_CONTENT;
@@ -96,7 +106,6 @@ const Variants = () => {
     setEditingId(v.id);
     setForm({
       product: v.productId,
-      sku: v.sku,
       barcode: v.barcode,
       shade: v.shade,
       size: v.size,
@@ -165,21 +174,6 @@ const Variants = () => {
           </div>
 
           <div className="f-field">
-            <label>{c.form.sku.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                name="sku"
-                value={form.sku}
-                onChange={handleChange}
-                placeholder={c.form.sku.placeholder}
-                disabled={Boolean(editingId)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="f-field">
             <label>{c.form.barcode.label}</label>
             <div className="f-control">
               <input
@@ -187,7 +181,13 @@ const Variants = () => {
                 name="barcode"
                 value={form.barcode}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  // Scanners send Enter after the code; don't submit the form
+                  if (e.key === "Enter") e.preventDefault();
+                }}
                 placeholder={c.form.barcode.placeholder}
+                autoComplete="off"
+                required
               />
             </div>
           </div>
@@ -307,7 +307,7 @@ const Variants = () => {
               <table className="st-tbl va-tbl">
                 <thead>
                   <tr>
-                    {c.list.columns.map((col) => (
+                    {COLUMNS.map((col) => (
                       <th key={col}>{col}</th>
                     ))}
                   </tr>
@@ -315,16 +315,15 @@ const Variants = () => {
                 <tbody>
                   {list.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={c.list.columns.length} className="st-empty">
+                      <td colSpan={COLUMNS.length} className="st-empty">
                         {c.list.empty}
                       </td>
                     </tr>
                   ) : (
                     list.rows.map((v) => (
                       <tr key={v.id}>
-                        <td className="st-bold">{v.sku}</td>
+                        <td className="st-bold">{v.barcode || "-"}</td>
                         <td className="st-muted">{productLabel(v)}</td>
-                        <td className="st-muted">{v.barcode || "-"}</td>
                         <td className="st-muted">{v.shade || "-"}</td>
                         <td className="st-muted">{v.size || "-"}</td>
                         <td className="st-muted">{v.color || "-"}</td>

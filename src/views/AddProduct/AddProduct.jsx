@@ -1,21 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ListChecks, Banknote, ChevronDown } from "lucide-react";
 import { PRODUCT_CONTENT } from "../../content/productContent";
 import { GST_RATES } from "../../models/productModel";
-import { createProduct } from "../../controllers/productController";
+import { createProductWithBarcode } from "../../controllers/productController";
 import { listCategoryOptions } from "../../controllers/categoryController";
 import { listSubcategoryOptions } from "../../controllers/subcategoryController";
 import { listBrandOptions } from "../../controllers/brandController";
 import { ROUTES } from "../../constants/routes";
 
 const EMPTY = {
-  code: "",
+  barcode: "",
   name: "",
   category: "",
   subcategory: "",
   description: "",
-  hsn: "",
   brand: "",
   gstRate: "",
   purchasePrice: "",
@@ -26,6 +25,7 @@ const EMPTY = {
 const AddProduct = () => {
   const c = PRODUCT_CONTENT;
   const navigate = useNavigate();
+  const barcodeRef = useRef(null);
 
   const [form, setForm] = useState(EMPTY);
   const [categories, setCategories] = useState([]);
@@ -33,6 +33,7 @@ const AddProduct = () => {
   const [brands, setBrands] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     listCategoryOptions().then(setCategories);
@@ -56,6 +57,7 @@ const AddProduct = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const v = type === "checkbox" ? checked : value;
+    if (name === "barcode") setSuccess("");
     setForm((p) =>
       name === "category"
         ? { ...p, category: v, subcategory: "" }
@@ -66,10 +68,15 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setSaving(true);
     try {
-      await createProduct(form);
-      navigate(ROUTES.PRODUCTS);
+      await createProductWithBarcode(form);
+      setSuccess(c.saved);
+      // Clear only the barcode; every other field keeps its last value
+      setForm((p) => ({ ...p, barcode: "" }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => barcodeRef.current?.focus(), 0);
     } catch (err) {
       setError(err.message);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -84,6 +91,7 @@ const AddProduct = () => {
       <p className="ap-subtitle">{c.subtitle}</p>
 
       {error && <p className="ap-error">{error}</p>}
+      {success && <p className="ap-success">{success}</p>}
 
       <div className="ap-card">
         <h3 className="ap-section">
@@ -93,14 +101,21 @@ const AddProduct = () => {
 
         <div className="ap-grid">
           <div className="ap-field">
-            <label>{c.basic.code.label}</label>
+            <label>{c.basic.barcode.label}</label>
             <input
+              ref={barcodeRef}
               className="ap-input ap-mono"
               type="text"
-              name="code"
-              value={form.code}
+              name="barcode"
+              value={form.barcode}
               onChange={handleChange}
-              placeholder={c.basic.code.placeholder}
+              onKeyDown={(e) => {
+                // Scanners send Enter after the code; don't submit the form
+                if (e.key === "Enter") e.preventDefault();
+              }}
+              placeholder={c.basic.barcode.placeholder}
+              autoFocus
+              autoComplete="off"
               required
             />
           </div>
@@ -170,18 +185,6 @@ const AddProduct = () => {
               value={form.description}
               onChange={handleChange}
               placeholder={c.basic.description.placeholder}
-            />
-          </div>
-
-          <div className="ap-field">
-            <label>{c.basic.hsn.label}</label>
-            <input
-              className="ap-input"
-              type="text"
-              name="hsn"
-              value={form.hsn}
-              onChange={handleChange}
-              placeholder={c.basic.hsn.placeholder}
             />
           </div>
         </div>

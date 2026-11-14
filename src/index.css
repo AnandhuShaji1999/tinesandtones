@@ -1869,3 +1869,75 @@ body {
   .pf-hero { flex-direction: column; text-align: center; }
   .pf-hero-t { align-items: center; }
 }
+.bx-done-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.bx-done {
+  background: #fff;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 20px;
+  padding: 36px 28px 28px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: bx-pop 0.25s ease-out;
+}
+
+@keyframes bx-pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bx-done-ic {
+  color: #16a34a;
+  display: inline-flex;
+}
+
+.bx-done h2 {
+  margin: 10px 0 18px;
+  font-size: 28px;
+  color: #166534;
+}
+
+.bx-done-l {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.bx-done-no {
+  margin: 6px 0 12px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  word-break: break-all;
+}
+
+.bx-done-t {
+  margin: 0 0 24px;
+  font-size: 18px;
+  color: #334155;
+}
+
+.bx-done-b {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}

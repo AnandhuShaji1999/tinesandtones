@@ -8,15 +8,21 @@ export const GST_RATES = [
 
 export const PRODUCT_PAGE_SIZE = 10;
 
+// The backend rejects a blank HSN/SAC code, and the Add Product form no
+// longer asks for it, so this default is sent instead. Change it if needed.
+export const DEFAULT_HSN = "330499";
+
 const money = (v) => Number(v).toFixed(2);
 
+// The scanned barcode is sent as product_code (the backend requires it).
+// The barcode itself is saved on the variant by createProductWithBarcode.
 export const toCreateProductPayload = (form) => {
   const payload = {
-    product_code: form.code.trim(),
+    product_code: form.barcode.trim(),
     name: form.name.trim(),
     category: form.category,
     description: form.description.trim(),
-    hsn_sac_code: form.hsn.trim(),
+    hsn_sac_code: (form.hsn || "").trim() || DEFAULT_HSN,
     gst_rate: form.gstRate,
     default_purchase_cost: money(form.purchasePrice),
     retail_price: money(form.retailPrice),
@@ -32,7 +38,7 @@ export const toUpdateProductPayload = (form) => {
   const payload = {
     name: form.name.trim(),
     description: form.description.trim(),
-    hsn_sac_code: form.hsn.trim(),
+    hsn_sac_code: (form.hsn || "").trim() || DEFAULT_HSN,
     gst_rate: Number(form.gstRate).toFixed(2),
     retail_price: money(form.retailPrice),
     expiry_tracked: Boolean(form.expiryTracked),

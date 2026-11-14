@@ -3,7 +3,7 @@ export const PRODUCT_CONTENT = {
   subtitle: "Enter comprehensive product specifications, pricing, and tax details.",
   basic: {
     title: "Basic Information",
-    code: { label: "Product Code", placeholder: "e.g. PRD-001" },
+    barcode: { label: "Barcode", placeholder: "Scan or enter barcode" },
     name: { label: "Product Name", placeholder: "Enter product name" },
     category: { label: "Category", placeholder: "Select category" },
     subcategory: {
@@ -31,4 +31,5 @@ export const PRODUCT_CONTENT = {
   cancel: "Cancel",
   save: "Save Product",
   saving: "Saving...",
+  saved: "Product saved. Scan the next barcode.",
 };

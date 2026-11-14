@@ -1,13 +1,17 @@
 import { PAGE_SIZE } from "./categoryModel";
 
-export const toCreateVariantPayload = (form) => ({
-  product: form.product,
-  sku: form.sku.trim(),
-  barcode: form.barcode.trim(),
-  shade: form.shade.trim(),
-  size: form.size.trim(),
-  color: form.color.trim(),
-});
+// The form has no SKU field. The backend requires one, so the barcode is sent as the SKU.
+export const toCreateVariantPayload = (form) => {
+  const barcode = form.barcode.trim();
+  return {
+    product: form.product,
+    sku: barcode,
+    barcode,
+    shade: form.shade.trim(),
+    size: form.size.trim(),
+    color: form.color.trim(),
+  };
+};
 
 // SKU and product are fixed after creation
 export const toUpdateVariantPayload = (form) => ({

@@ -99,13 +99,15 @@ const Billing = () => {
   const [results, setResults] = useState([]);
   const [cart, setCart] = useState([]);
   const [billDiscount, setBillDiscount] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  // Re-runs on every search change and whenever refreshKey changes (after a sale)
   useEffect(() => {
     const t = setTimeout(() => {
       searchSellable(q.trim()).then(setResults);
     }, 250);
     return () => clearTimeout(t);
-  }, [q]);
+  }, [q, refreshKey]);
 
   const addItem = (it) => {
     setCart((p) => {
@@ -220,7 +222,11 @@ const Billing = () => {
     setBillDiscount("");
     setPayments([emptyPayment()]);
     setCustomer("");
+    setCustSearch("");
     setMode("walkin");
+    setShowNew(false);
+    setNewCust(EMPTY_CUSTOMER);
+    setQ("");
     setError("");
   };
 
@@ -247,10 +253,11 @@ const Billing = () => {
         },
         keyRef.current
       );
-      setReceipt(sale);
+      // Refresh the page state, then show the big "Bill Completed" popup
       resetBill();
       keyRef.current = null;
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setRefreshKey((k) => k + 1);
+      setReceipt(sale);
       loadSales();
     } catch (err) {
       setError(err.message);
@@ -258,6 +265,11 @@ const Billing = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const closeReceipt = () => {
+    setReceipt(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handlePdf = async (sale) => {
@@ -388,28 +400,6 @@ const Billing = () => {
       {/* ===================== NEW BILL ===================== */}
       {tab === "new" && (
         <>
-          {receipt && (
-            <div className="bx-receipt">
-              <CheckCircle2 size={28} />
-              <div className="bx-receipt-t">
-                <h3>{c.receipt.title}</h3>
-                <p>
-                  {c.receipt.invoice} <b>{receipt.invoiceNumber || "-"}</b> &middot;{" "}
-                  {c.receipt.total} <b>{inr(receipt.total)}</b>
-                </p>
-              </div>
-              <div className="bx-receipt-b">
-                <button type="button" className="bx-btn ghost" onClick={() => handlePdf(receipt)}>
-                  <Download size={14} />
-                  {c.receipt.pdf}
-                </button>
-                <button type="button" className="bx-btn" onClick={() => setReceipt(null)}>
-                  {c.receipt.newBill}
-                </button>
-              </div>
-            </div>
-          )}
-
           {error && <p className="bx-alert">{error}</p>}
 
           <div className="bx-grid">
@@ -1008,6 +998,32 @@ const Billing = () => {
               <button type="button" className="bx-btn" onClick={() => handlePdf(detail)}>
                 <Download size={14} />
                 {c.history.pdf}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== BILL COMPLETED POPUP ===================== */}
+      {receipt && (
+        <div className="bx-done-wrap" onClick={closeReceipt}>
+          <div className="bx-done" onClick={(e) => e.stopPropagation()}>
+            <span className="bx-done-ic">
+              <CheckCircle2 size={72} />
+            </span>
+            <h2>{c.receipt.title}</h2>
+            <p className="bx-done-l">Bill Number</p>
+            <div className="bx-done-no">{receipt.invoiceNumber || "-"}</div>
+            <p className="bx-done-t">
+              {c.receipt.total} <b>{inr(receipt.total)}</b>
+            </p>
+            <div className="bx-done-b">
+              <button type="button" className="bx-btn ghost" onClick={() => handlePdf(receipt)}>
+                <Download size={15} />
+                {c.receipt.pdf}
+              </button>
+              <button type="button" className="bx-btn lg" onClick={closeReceipt} autoFocus>
+                {c.receipt.newBill}
               </button>
             </div>
           </div>
