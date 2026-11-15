@@ -46,6 +46,12 @@ export const toPasswordPayload = ({ current, next }) => ({
   new_password: next,
 });
 
+// Only the fields the user can edit are sent
+export const toProfileUpdatePayload = ({ firstName, lastName }) => ({
+  first_name: firstName.trim(),
+  last_name: lastName.trim(),
+});
+
 export const formatJoined = (v) => {
   if (!v) return "-";
   const d = new Date(v);

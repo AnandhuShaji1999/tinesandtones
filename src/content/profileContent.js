@@ -13,6 +13,16 @@ export const PROFILE_CONTENT = {
     admin: "Business Admin",
     staff: "Staff",
   },
+  edit: {
+    button: "Edit Profile",
+    firstName: "First Name",
+    lastName: "Last Name",
+    emailNote: "Email cannot be changed here.",
+    save: "Save Changes",
+    saving: "Saving...",
+    cancel: "Cancel",
+    done: "Profile updated successfully.",
+  },
   branches: {
     title: "Branch Access",
     columns: ["BRANCH", "ROLE"],

@@ -6,6 +6,11 @@ export const getMe = async () => {
   return data;
 };
 
+export const patchMe = async (payload) => {
+  const { data } = await axiosInstance.patch(API_ENDPOINTS.AUTH.ME, payload);
+  return data;
+};
+
 export const postChangePassword = async (payload) => {
   const { data } = await axiosInstance.post(
     API_ENDPOINTS.AUTH.CHANGE_PASSWORD,

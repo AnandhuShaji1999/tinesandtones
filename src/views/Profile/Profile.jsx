@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, LogOut } from "lucide-react";
+import { Eye, EyeOff, LogOut, Pencil } from "lucide-react";
 import { PROFILE_CONTENT } from "../../content/profileContent";
 import { formatJoined } from "../../models/profileModel";
 import {
   changePassword,
   getCachedProfile,
   loadProfile,
+  updateProfile,
 } from "../../controllers/profileController";
 import { logout } from "../../controllers/authController";
 import { ROUTES } from "../../constants/routes";
@@ -20,6 +21,11 @@ const Profile = () => {
   const [profile, setProfile] = useState(getCachedProfile());
   const [error, setError] = useState("");
 
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ firstName: "", lastName: "" });
+  const [editSaving, setEditSaving] = useState(false);
+  const [editMsg, setEditMsg] = useState({ ok: false, text: "" });
+
   const [pw, setPw] = useState(EMPTY_PW);
   const [show, setShow] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -30,6 +36,38 @@ const Profile = () => {
       .then(setProfile)
       .catch((err) => setError(err.message));
   }, []);
+
+  const startEdit = () => {
+    setForm({ firstName: profile.firstName, lastName: profile.lastName });
+    setEditMsg({ ok: false, text: "" });
+    setEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setEditing(false);
+    setEditMsg({ ok: false, text: "" });
+  };
+
+  const handleForm = (e) => {
+    const { name, value } = e.target;
+    setForm((p) => ({ ...p, [name]: value }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setEditMsg({ ok: false, text: "" });
+    setEditSaving(true);
+    try {
+      const updated = await updateProfile(form);
+      setProfile(updated);
+      setEditing(false);
+      setEditMsg({ ok: true, text: c.edit.done });
+    } catch (err) {
+      setEditMsg({ ok: false, text: err.message });
+    } finally {
+      setEditSaving(false);
+    }
+  };
 
   const handlePw = (e) => {
     const { name, value } = e.target;
@@ -87,31 +125,94 @@ const Profile = () => {
           </section>
 
           <section className="st-card">
-            <h3 className="st-card-title">{c.account.title}</h3>
-            <div className="pf-kv">
-              <div>
-                <span>{c.account.name}</span>
-                <b>{profile.fullName || "-"}</b>
+            <h3 className="st-card-title">
+              {c.account.title}
+              {!editing && (
+                <button
+                  type="button"
+                  className="cat-edit"
+                  style={{ marginLeft: "auto" }}
+                  onClick={startEdit}
+                >
+                  <Pencil size={14} /> {c.edit.button}
+                </button>
+              )}
+            </h3>
+
+            {editMsg.ok && <p className="st-msg st-success">{editMsg.text}</p>}
+
+            {editing ? (
+              <form onSubmit={handleUpdate}>
+                <div className="st-grid">
+                  <div className="f-field">
+                    <label>{c.edit.firstName}</label>
+                    <div className="f-control">
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={form.firstName}
+                        onChange={handleForm}
+                        autoFocus
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="f-field">
+                    <label>{c.edit.lastName}</label>
+                    <div className="f-control">
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={form.lastName}
+                        onChange={handleForm}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <p className="st-msg cat-note">
+                  {c.account.email}: {profile.email}. {c.edit.emailNote}
+                </p>
+                {editMsg.text && !editMsg.ok && (
+                  <p className="st-msg st-error">{editMsg.text}</p>
+                )}
+
+                <div className="st-actions">
+                  <button type="button" className="st-reset" onClick={cancelEdit}>
+                    {c.edit.cancel}
+                  </button>
+                  <button type="submit" className="st-submit" disabled={editSaving}>
+                    {editSaving ? c.edit.saving : c.edit.save}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="pf-kv">
+                <div>
+                  <span>{c.account.name}</span>
+                  <b>{profile.fullName || "-"}</b>
+                </div>
+                <div>
+                  <span>{c.account.email}</span>
+                  <b>{profile.email || "-"}</b>
+                </div>
+                <div>
+                  <span>{c.account.type}</span>
+                  <b>{profile.isAdmin ? c.account.admin : c.account.staff}</b>
+                </div>
+                <div>
+                  <span>{c.account.status}</span>
+                  <b className={profile.isActive ? "pf-ok" : "pf-bad"}>
+                    {profile.isActive ? c.account.active : c.account.inactive}
+                  </b>
+                </div>
+                <div>
+                  <span>{c.account.joined}</span>
+                  <b>{formatJoined(profile.joined)}</b>
+                </div>
               </div>
-              <div>
-                <span>{c.account.email}</span>
-                <b>{profile.email || "-"}</b>
-              </div>
-              <div>
-                <span>{c.account.type}</span>
-                <b>{profile.isAdmin ? c.account.admin : c.account.staff}</b>
-              </div>
-              <div>
-                <span>{c.account.status}</span>
-                <b className={profile.isActive ? "pf-ok" : "pf-bad"}>
-                  {profile.isActive ? c.account.active : c.account.inactive}
-                </b>
-              </div>
-              <div>
-                <span>{c.account.joined}</span>
-                <b>{formatJoined(profile.joined)}</b>
-              </div>
-            </div>
+            )}
           </section>
 
           <section className="st-card">

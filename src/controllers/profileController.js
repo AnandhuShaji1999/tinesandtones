@@ -1,7 +1,11 @@
 import * as profileService from "../services/profileService";
 import tokenService from "../services/tokenService";
 import { parseApiError } from "../models/authModel";
-import { fromProfile, toPasswordPayload } from "../models/profileModel";
+import {
+  fromProfile,
+  toPasswordPayload,
+  toProfileUpdatePayload,
+} from "../models/profileModel";
 
 // Instant, from the saved login (may be null)
 export const getCachedProfile = () => {
@@ -26,6 +30,19 @@ export const loadProfile = async () => {
     return fromProfile(raw);
   } catch (err) {
     throw new Error(parseApiError(err, "Could not load your profile"));
+  }
+};
+
+// PATCH /auth/me/ then refresh the saved user
+export const updateProfile = async (form) => {
+  if (!form.firstName.trim()) throw new Error("First name is required.");
+  try {
+    const res = await profileService.patchMe(toProfileUpdatePayload(form));
+    const merged = { ...(tokenService.getUser() || {}), ...res };
+    tokenService.setUser(merged);
+    return fromProfile(merged);
+  } catch (err) {
+    throw new Error(parseApiError(err, "Could not update your profile"));
   }
 };
 
