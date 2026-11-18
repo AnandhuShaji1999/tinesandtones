@@ -74,6 +74,7 @@ const Profile = () => {
     setPw((p) => ({ ...p, [name]: value }));
   };
 
+  // POST /auth/change-password/ -> then sign out so the user logs in again
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPwMsg({ ok: false, text: "" });
@@ -82,9 +83,11 @@ const Profile = () => {
       await changePassword(pw);
       setPw(EMPTY_PW);
       setPwMsg({ ok: true, text: c.password.done });
+      await new Promise((r) => setTimeout(r, 1800));
+      await logout();
+      navigate(ROUTES.LOGIN);
     } catch (err) {
       setPwMsg({ ok: false, text: err.message });
-    } finally {
       setSaving(false);
     }
   };
@@ -267,6 +270,7 @@ const Profile = () => {
                     value={pw[k]}
                     onChange={handlePw}
                     autoComplete={k === "current" ? "current-password" : "new-password"}
+                    disabled={saving}
                     required
                   />
                   {k === "current" && (

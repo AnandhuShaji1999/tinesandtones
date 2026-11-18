@@ -36,7 +36,7 @@ export const PROFILE_CONTENT = {
     hint: "At least 8 characters.",
     submit: "Update Password",
     saving: "Saving...",
-    done: "Password updated successfully.",
+    done: "Password updated. Signing you out, please log in again with your new password...",
   },
   signOut: "Sign Out",
 };
