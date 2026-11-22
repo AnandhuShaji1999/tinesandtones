@@ -85,7 +85,7 @@ export const findInvoice = async (invoiceNumber) => {
   }
 };
 
-// Downloads the printable PDF
+// Downloads the PDF
 export const downloadSalePdf = async (id, invoiceNumber) => {
   try {
     const blob = await billingService.getSalePdf(id);
@@ -97,6 +97,20 @@ export const downloadSalePdf = async (id, invoiceNumber) => {
     URL.revokeObjectURL(url);
   } catch (err) {
     throw new Error(parseApiError(err, "Could not download the PDF"));
+  }
+};
+
+// Opens the PDF in the tab that was opened by the click (avoids popup blockers)
+export const viewSalePdf = async (id, win) => {
+  try {
+    const blob = await billingService.getSalePdf(id);
+    const url = URL.createObjectURL(blob);
+    if (win) win.location.href = url;
+    else window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (err) {
+    if (win) win.close();
+    throw new Error(parseApiError(err, "Could not open the PDF"));
   }
 };
 

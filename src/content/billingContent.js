@@ -1,5 +1,9 @@
 export const BILLING_CONTENT = {
   title: "POS Billing",
+  shop: {
+    name: "Tints & Tones",
+    address: "Tints & Tones Thodupuzha",
+  },
   tabs: { new: "New Bill", history: "Sales History" },
   branch: { label: "Branch", placeholder: "Select branch", id: "Branch ID" },
   items: {
@@ -57,8 +61,11 @@ export const BILLING_CONTENT = {
     title: "Sale Completed",
     invoice: "Invoice",
     total: "Total",
+    print: "Print Bill",
+    view: "View PDF",
     pdf: "Download PDF",
     newBill: "New Bill",
+    thanks: "Thank you! Visit again.",
   },
   history: {
     title: "Sales History",
@@ -69,6 +76,7 @@ export const BILLING_CONTENT = {
     columns: ["INVOICE", "DATE", "CUSTOMER", "BRANCH", "TOTAL", "ACTIONS"],
     empty: "No sales found.",
     view: "View",
+    print: "Print",
     pdf: "PDF",
   },
   detail: {

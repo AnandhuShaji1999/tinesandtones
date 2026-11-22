@@ -2035,3 +2035,32 @@ body {
 .sk-edit-in:focus { border-color: #1b55c6; }
 .sk-edit-check { width: 18px; height: 18px; accent-color: #1b55c6; }
 .pm-modal-box .st-submit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+/* ================= BILL PRINT + ACTION BUTTONS ================= */
+.bx-dfoot { align-items: center; flex-wrap: wrap; }
+.bx-dfoot-r { display: flex; gap: 8px; flex-wrap: wrap; }
+.bx-done-new { width: 100%; margin-top: 12px; flex: none; }
+
+.rc-print { display: none; }
+
+@media print {
+  body.printing-receipt #root { display: none !important; }
+  body.printing-receipt .rc-print { display: block; }
+
+  .rc-box {
+    width: 72mm; margin: 0 auto; padding: 2mm 0; color: #000;
+    font-family: "Courier New", monospace; font-size: 11px; line-height: 1.35;
+  }
+  .rc-shop { font-size: 18px; text-align: center; font-weight: 700; margin: 0; }
+  .rc-addr { text-align: center; font-size: 11px; margin: 2px 0 4px; }
+  .rc-box hr { border: none; border-top: 1px dashed #000; margin: 6px 0; }
+  .rc-meta div { display: flex; justify-content: space-between; gap: 8px; }
+  .rc-tbl { width: 100%; border-collapse: collapse; }
+  .rc-tbl th { text-align: left; font-size: 10px; border-bottom: 1px solid #000; padding: 2px 0; }
+  .rc-tbl th:nth-child(n+2), .rc-tbl td:nth-child(n+2) { text-align: right; }
+  .rc-tbl td { padding: 3px 0; vertical-align: top; }
+  .rc-tbl small { display: block; font-size: 9px; }
+  .rc-row { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
+  .rc-total { font-size: 14px; font-weight: 700; border-top: 1px solid #000; margin-top: 3px; padding-top: 3px; }
+  .rc-small { font-size: 9px; text-align: right; }
+  .rc-thanks { text-align: center; margin-top: 4px; }
+}

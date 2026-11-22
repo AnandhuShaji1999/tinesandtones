@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Banknote,
   CheckCircle2,
@@ -8,8 +9,10 @@ import {
   CreditCard,
   Download,
   Eye,
+  FileText,
   Minus,
   Plus,
+  Printer,
   ScanLine,
   Search,
   ShoppingBag,
@@ -18,6 +21,7 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
+import Receipt from "../../components/Receipt";
 import { BILLING_CONTENT } from "../../content/billingContent";
 import {
   BILL_PAGE_SIZE,
@@ -37,6 +41,7 @@ import {
   listCustomers,
   listSales,
   searchSellable,
+  viewSalePdf,
 } from "../../controllers/billingController";
 import { listBranches } from "../../controllers/staffController";
 
@@ -272,14 +277,55 @@ const Billing = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  /* ---------- PDF + print ---------- */
+  const [printSale, setPrintSale] = useState(null);
+
+  const showError = (msg) => {
+    setError(msg);
+    setHError(msg);
+  };
+
   const handlePdf = async (sale) => {
     try {
       await downloadSalePdf(sale.id, sale.invoiceNumber);
     } catch (err) {
-      setError(err.message);
-      setHError(err.message);
+      showError(err.message);
     }
   };
+
+  const handleView = async (sale) => {
+    // Open the tab inside the click so the browser does not block it
+    const win = window.open("", "_blank");
+    try {
+      await viewSalePdf(sale.id, win);
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  // Loads the full sale (names, lines, payments), then prints it
+  const handlePrint = async (sale) => {
+    try {
+      setPrintSale(await getSale(sale.id));
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    if (!printSale) return undefined;
+    const done = () => {
+      document.body.classList.remove("printing-receipt");
+      setPrintSale(null);
+    };
+    window.addEventListener("afterprint", done, { once: true });
+    document.body.classList.add("printing-receipt");
+    const t = setTimeout(() => window.print(), 150);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("afterprint", done);
+    };
+  }, [printSale]);
 
   /* ---------- history ---------- */
   const [hBranch, setHBranch] = useState("");
@@ -867,10 +913,28 @@ const Billing = () => {
                           <td className="pm-bold">{inr(s.total)}</td>
                           <td>
                             <div className="pm-actions">
-                              <button type="button" aria-label="View" onClick={() => openDetail(s)}>
+                              <button
+                                type="button"
+                                aria-label="View details"
+                                title="View details"
+                                onClick={() => openDetail(s)}
+                              >
                                 <Eye size={16} />
                               </button>
-                              <button type="button" aria-label="PDF" onClick={() => handlePdf(s)}>
+                              <button
+                                type="button"
+                                aria-label="Print"
+                                title="Print bill"
+                                onClick={() => handlePrint(s)}
+                              >
+                                <Printer size={16} />
+                              </button>
+                              <button
+                                type="button"
+                                aria-label="Download PDF"
+                                title="Download PDF"
+                                onClick={() => handlePdf(s)}
+                              >
                                 <Download size={16} />
                               </button>
                             </div>
@@ -991,14 +1055,24 @@ const Billing = () => {
               <strong>{inr(detail.total)}</strong>
             </div>
 
-            <div className="pm-modal-foot">
+            <div className="pm-modal-foot bx-dfoot">
               <button type="button" className="bx-btn ghost" onClick={() => setDetail(null)}>
                 {c.detail.close}
               </button>
-              <button type="button" className="bx-btn" onClick={() => handlePdf(detail)}>
-                <Download size={14} />
-                {c.history.pdf}
-              </button>
+              <div className="bx-dfoot-r">
+                <button type="button" className="bx-btn" onClick={() => handlePrint(detail)}>
+                  <Printer size={14} />
+                  {c.receipt.print}
+                </button>
+                <button type="button" className="bx-btn ghost" onClick={() => handleView(detail)}>
+                  <FileText size={14} />
+                  {c.receipt.view}
+                </button>
+                <button type="button" className="bx-btn ghost" onClick={() => handlePdf(detail)}>
+                  <Download size={14} />
+                  {c.history.pdf}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1018,17 +1092,28 @@ const Billing = () => {
               {c.receipt.total} <b>{inr(receipt.total)}</b>
             </p>
             <div className="bx-done-b">
+              <button type="button" className="bx-btn" onClick={() => handlePrint(receipt)}>
+                <Printer size={15} />
+                {c.receipt.print}
+              </button>
+              <button type="button" className="bx-btn ghost" onClick={() => handleView(receipt)}>
+                <FileText size={15} />
+                {c.receipt.view}
+              </button>
               <button type="button" className="bx-btn ghost" onClick={() => handlePdf(receipt)}>
                 <Download size={15} />
                 {c.receipt.pdf}
               </button>
-              <button type="button" className="bx-btn lg" onClick={closeReceipt} autoFocus>
-                {c.receipt.newBill}
-              </button>
             </div>
+            <button type="button" className="bx-btn lg bx-done-new" onClick={closeReceipt} autoFocus>
+              {c.receipt.newBill}
+            </button>
           </div>
         </div>
       )}
+
+      {/* Printable bill (outside the app root, visible only when printing) */}
+      {printSale && createPortal(<Receipt sale={printSale} />, document.body)}
     </div>
   );
 };
