@@ -2027,3 +2027,11 @@ body {
   color: #0b4fc4; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 500; cursor: pointer;
 }
 .ap-created-btn:hover { background: #eef4ff; }
+/* ================= STOCK: EDIT POPUP ================= */
+.sk-edit-in {
+  width: 100%; height: 38px; border: 1px solid #e3e5ee; border-radius: 6px;
+  padding: 0 10px; font-family: inherit; font-size: 13px; color: #0f1538; outline: none; background: #fff;
+}
+.sk-edit-in:focus { border-color: #1b55c6; }
+.sk-edit-check { width: 18px; height: 18px; accent-color: #1b55c6; }
+.pm-modal-box .st-submit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }

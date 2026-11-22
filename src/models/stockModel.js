@@ -60,6 +60,7 @@ export const sumOf = (rows, key) =>
 
 const MONEY = /(price|cost|amount|value|total)/;
 const DATE_TIME = /^\d{4}-\d{2}-\d{2}T/;
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
 export const formatCell = (key, value, lookup = {}) => {
   if (value === null || value === undefined || value === "") return "-";
@@ -80,4 +81,45 @@ export const formatCell = (key, value, lookup = {}) => {
     })}`;
   }
   return str;
+};
+
+/* ---------- batch editing ---------- */
+
+// Never editable: ids, timestamps, links to other records, nested/derived names
+const READ_ONLY =
+  /^(id|created_at|updated_at|received_at|branch|variant|purchase|product)$|\.|_name$|_sku$|^sku$/;
+
+export const isEditable = (key) => !READ_ONLY.test(key);
+
+export const editableKeys = (detail) =>
+  Object.keys(detail || {}).filter(isEditable);
+
+export const inputTypeOf = (key, value) => {
+  if (typeof value === "boolean") return "checkbox";
+  if (DATE_ONLY.test(String(value ?? "")) || /(^|_)date$/.test(key)) return "date";
+  if (typeof value === "number") return "number";
+  return "text";
+};
+
+// Form state: every editable field as its current value
+export const toBatchForm = (detail) => {
+  const form = {};
+  editableKeys(detail).forEach((k) => {
+    const v = detail[k];
+    form[k] = typeof v === "boolean" ? v : v ?? "";
+  });
+  return form;
+};
+
+// PATCH body: only the fields the user changed
+export const toBatchPatch = (detail, form) => {
+  const body = {};
+  Object.keys(form).forEach((k) => {
+    const before = typeof detail[k] === "boolean" ? detail[k] : detail[k] ?? "";
+    if (form[k] === before) return;
+    if (typeof form[k] === "boolean") body[k] = form[k];
+    else if (form[k] === "") body[k] = null;
+    else body[k] = form[k];
+  });
+  return body;
 };

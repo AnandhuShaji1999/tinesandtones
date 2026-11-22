@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   Archive,
@@ -9,6 +10,7 @@ import {
   Eye,
   Filter,
   Package,
+  Pencil,
   RotateCcw,
   Search,
   X,
@@ -16,21 +18,30 @@ import {
 import { STOCK_CONTENT } from "../../content/stockContent";
 import {
   columnsOf,
+  editableKeys,
   formatCell,
   humanize,
+  inputTypeOf,
   qtyKey,
   sumOf,
+  toBatchForm,
 } from "../../models/stockModel";
 import { PAGE_SIZE } from "../../models/categoryModel";
-import { listStock, getBatchDetail } from "../../controllers/stockController";
+import {
+  listStock,
+  getBatchDetail,
+  updateBatchDetail,
+} from "../../controllers/stockController";
 import { listBranches } from "../../controllers/staffController";
 import { listVariantOptions } from "../../controllers/variantController";
+import { ROUTES } from "../../constants/routes";
 
 const EMPTY = { branch: "", variant: "", purchase: "", q: "" };
 const TABS = ["balances", "batches", "ledger"];
 
 const Stock = () => {
   const c = STOCK_CONTENT;
+  const navigate = useNavigate();
   const [tab, setTab] = useState("balances");
   const [draft, setDraft] = useState(EMPTY);
   const [applied, setApplied] = useState(EMPTY);
@@ -42,6 +53,10 @@ const Stock = () => {
   const [variants, setVariants] = useState([]);
 
   const [detail, setDetail] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [editMsg, setEditMsg] = useState({ ok: false, text: "" });
 
   useEffect(() => {
     listBranches().then(setBranches);
@@ -118,7 +133,15 @@ const Stock = () => {
     setPage(1);
   };
 
+  const closeDetail = () => {
+    setDetail(null);
+    setEditing(false);
+    setEditMsg({ ok: false, text: "" });
+  };
+
   const openDetail = async (row) => {
+    setEditing(false);
+    setEditMsg({ ok: false, text: "" });
     if (tab === "batches" && row.id !== undefined && row.id !== "") {
       try {
         setDetail(await getBatchDetail(row.id));
@@ -128,6 +151,37 @@ const Stock = () => {
       }
     }
     setDetail(row);
+  };
+
+  // Only batches have an id and a detail endpoint to update
+  const canEdit = tab === "batches" && detail && detail.id !== undefined && detail.id !== "";
+
+  const startEdit = () => {
+    setForm(toBatchForm(detail));
+    setEditMsg({ ok: false, text: "" });
+    setEditing(true);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((p) => ({ ...p, [name]: type === "checkbox" ? checked : value }));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setEditMsg({ ok: false, text: "" });
+    setSaving(true);
+    try {
+      const updated = await updateBatchDetail(detail.id, detail, form);
+      setDetail(updated);
+      setEditing(false);
+      setEditMsg({ ok: true, text: c.edit.success });
+      load();
+    } catch (err) {
+      setEditMsg({ ok: false, text: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleExport = () => {
@@ -382,29 +436,106 @@ const Stock = () => {
         )}
       </div>
 
-      {/* ============ Detail popup (all fields) ============ */}
+      {/* ============ Detail popup (view + edit) ============ */}
       {detail && (
-        <div className="pm-modal" onClick={() => setDetail(null)}>
+        <div className="pm-modal" onClick={closeDetail}>
           <div className="pm-modal-box" onClick={(e) => e.stopPropagation()}>
             <div className="pm-modal-head">
-              <h3>{c.detail.title}</h3>
-              <button
-                type="button"
-                onClick={() => setDetail(null)}
-                aria-label={c.detail.close}
-              >
+              <h3>{editing ? c.edit.title : c.detail.title}</h3>
+              <button type="button" onClick={closeDetail} aria-label={c.detail.close}>
                 <X size={18} />
               </button>
             </div>
 
-            <div className="sk-kv">
-              {Object.keys(detail).map((k) => (
-                <div className="sk-kv-row" key={k}>
-                  <span>{humanize(k)}</span>
-                  <b>{formatCell(k, detail[k], lookup)}</b>
+            {editMsg.ok && <p className="st-msg st-success">{editMsg.text}</p>}
+
+            {editing ? (
+              <form onSubmit={handleSave}>
+                <div className="sk-kv">
+                  {Object.keys(detail).map((k) => {
+                    const editable = editableKeys(detail).includes(k);
+                    const type = inputTypeOf(k, detail[k]);
+                    return (
+                      <div className="sk-kv-row" key={k}>
+                        <span>{humanize(k)}</span>
+                        {editable ? (
+                          type === "checkbox" ? (
+                            <input
+                              type="checkbox"
+                              name={k}
+                              checked={Boolean(form[k])}
+                              onChange={handleFormChange}
+                              className="sk-edit-check"
+                            />
+                          ) : (
+                            <input
+                              type={type}
+                              step={type === "number" ? "any" : undefined}
+                              name={k}
+                              value={form[k] ?? ""}
+                              onChange={handleFormChange}
+                              className="sk-edit-in"
+                            />
+                          )
+                        ) : (
+                          <b>{formatCell(k, detail[k], lookup)}</b>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+
+                <p className="st-msg cat-note">{c.edit.readOnly}</p>
+                {editMsg.text && !editMsg.ok && (
+                  <p className="st-msg st-error">{editMsg.text}</p>
+                )}
+
+                <div className="st-actions">
+                  <button
+                    type="button"
+                    className="st-reset"
+                    onClick={() => {
+                      setEditing(false);
+                      setEditMsg({ ok: false, text: "" });
+                    }}
+                  >
+                    {c.edit.cancel}
+                  </button>
+                  <button type="submit" className="st-submit" disabled={saving}>
+                    {saving ? c.edit.saving : c.edit.save}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div className="sk-kv">
+                  {Object.keys(detail).map((k) => (
+                    <div className="sk-kv-row" key={k}>
+                      <span>{humanize(k)}</span>
+                      <b>{formatCell(k, detail[k], lookup)}</b>
+                    </div>
+                  ))}
+                </div>
+
+                {!canEdit && <p className="st-msg cat-note">{c.edit.auditNote}</p>}
+
+                <div className="st-actions">
+                  {canEdit ? (
+                    <button type="button" className="st-submit" onClick={startEdit}>
+                      <Pencil size={14} /> {c.edit.button}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="st-submit"
+                      onClick={() => navigate(ROUTES.STOCK_AUDITS)}
+                    >
+                      {c.edit.auditBtn}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

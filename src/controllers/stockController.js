@@ -1,7 +1,7 @@
 import * as stockService from "../services/stockService";
 import { parseApiError } from "../models/authModel";
 import { PAGE_SIZE } from "../models/categoryModel";
-import { fromStockList, flatten } from "../models/stockModel";
+import { fromStockList, flatten, toBatchPatch } from "../models/stockModel";
 
 const FETCHERS = {
   balances: stockService.getBalances,
@@ -30,5 +30,16 @@ export const getBatchDetail = async (id) => {
     return flatten(await stockService.getBatch(id));
   } catch (err) {
     throw new Error(parseApiError(err, "Could not load batch"));
+  }
+};
+
+// PATCH only the changed fields, then return the refreshed batch
+export const updateBatchDetail = async (id, detail, form) => {
+  const body = toBatchPatch(detail, form);
+  if (!Object.keys(body).length) throw new Error("No changes to save.");
+  try {
+    return flatten(await stockService.patchBatch(id, body));
+  } catch (err) {
+    throw new Error(parseApiError(err, "Could not update the batch"));
   }
 };

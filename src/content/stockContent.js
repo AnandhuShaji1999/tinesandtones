@@ -28,4 +28,16 @@ export const STOCK_CONTENT = {
   empty: "No stock records found.",
   actions: "ACTION",
   detail: { title: "Stock Details", close: "Close" },
+  edit: {
+    button: "Edit",
+    title: "Edit Batch",
+    save: "Save Changes",
+    saving: "Saving...",
+    cancel: "Cancel",
+    success: "Batch updated successfully.",
+    readOnly: "Branch, variant, product and system fields cannot be edited.",
+    auditNote:
+      "Balances and ledger entries are calculated and cannot be edited directly. To correct a quantity, record a stock audit.",
+    auditBtn: "Adjust via Stock Audit",
+  },
 };
