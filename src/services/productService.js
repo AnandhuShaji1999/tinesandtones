@@ -32,3 +32,12 @@ export const updateProduct = async (id, payload) => {
 export const deactivateProduct = async (id) => {
   await axiosInstance.delete(API_ENDPOINTS.PRODUCTS.DETAIL(id));
 };
+
+// GET /products/{id}/barcode-labels/?quantity=N
+export const getBarcodeLabels = async (id, quantity) => {
+  const { data } = await axiosInstance.get(
+    API_ENDPOINTS.PRODUCTS.BARCODE_LABELS(id),
+    { params: { quantity } }
+  );
+  return data;
+};

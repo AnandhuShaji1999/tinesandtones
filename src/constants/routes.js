@@ -9,6 +9,7 @@ export const ROUTES = {
   PRODUCTS: "/products",
   ADD_PRODUCT: "/products/new",
   VARIANTS: "/variants",
+  BARCODES: "/barcodes",
   SUPPLIERS: "/suppliers",
   PURCHASES: "/purchases",
   ADD_PURCHASE: "/purchases/new",

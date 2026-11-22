@@ -3,29 +3,34 @@ import axiosInstance from "../api/axiosInstance";
 import { API_ENDPOINTS } from "../constants/apiConstants";
 import { parseApiError } from "../models/authModel";
 import {
+  BARCODE_MAX_QTY,
+  BARCODE_MIN_QTY,
   PRODUCT_PAGE_SIZE,
   toCreateProductPayload,
   toUpdateProductPayload,
   fromProduct,
   fromProductList,
+  fromBarcodeLabels,
 } from "../models/productModel";
 
+// Empty filters are not sent (an empty "barcode=" would match nothing)
 export const listProducts = async ({
   search = "",
   category = "",
   subcategory = "",
   brand = "",
+  barcode = "",
   page = 1,
 } = {}) => {
+  const params = { page, page_size: PRODUCT_PAGE_SIZE };
+  if (search) params.search = search;
+  if (category) params.category = category;
+  if (subcategory) params.subcategory = subcategory;
+  if (brand) params.brand = brand;
+  if (barcode) params.barcode = barcode;
+
   try {
-    const data = await productService.getProducts({
-      search,
-      category,
-      subcategory,
-      brand,
-      page,
-      page_size: PRODUCT_PAGE_SIZE,
-    });
+    const data = await productService.getProducts(params);
     return fromProductList(data, page);
   } catch (err) {
     throw new Error(parseApiError(err, "Could not load products"));
@@ -52,6 +57,39 @@ export const getProduct = async (id) => {
   }
 };
 
+// Exact lookup of a scanned barcode (product barcodes and saved variant barcodes)
+export const lookupBarcode = async (barcode) => {
+  const code = String(barcode || "").trim();
+  if (!code) return [];
+  try {
+    const data = await productService.getProducts({
+      barcode: code,
+      page: 1,
+      page_size: 20,
+    });
+    return fromProductList(data, 1).rows;
+  } catch (err) {
+    throw new Error(parseApiError(err, "Could not look up the barcode"));
+  }
+};
+
+// One entry per label to print (quantity 1 to 1000)
+export const loadBarcodeLabels = async (productId, quantity) => {
+  const n = Number(quantity);
+  if (!Number.isInteger(n) || n < BARCODE_MIN_QTY || n > BARCODE_MAX_QTY) {
+    throw new Error(
+      `Use a whole number between ${BARCODE_MIN_QTY} and ${BARCODE_MAX_QTY}.`
+    );
+  }
+  try {
+    return fromBarcodeLabels(
+      await productService.getBarcodeLabels(productId, n)
+    );
+  } catch (err) {
+    throw new Error(parseApiError(err, "Could not load barcode labels"));
+  }
+};
+
 export const createProduct = async (form) => {
   try {
     return fromProduct(
@@ -62,37 +100,22 @@ export const createProduct = async (form) => {
   }
 };
 
-// Barcode lives on the variant: check it, create the product, then its variant
-export const createProductWithBarcode = async (form) => {
-  const barcode = form.barcode.trim();
-
-  let existing = [];
-  try {
-    const { data } = await axiosInstance.get(API_ENDPOINTS.VARIANTS.LIST, {
-      params: { search: barcode },
-    });
-    existing = Array.isArray(data) ? data : data?.results || [];
-  } catch {
-    // If the check fails, the backend still rejects duplicates on save
-  }
-  if (existing.some((v) => v.barcode === barcode || v.sku === barcode)) {
-    throw new Error("This barcode already exists.");
-  }
-
+// Creates the product (the backend generates its barcode), then a default
+// variant so the product can be sold in Billing. Returns the saved product.
+export const createProductWithVariant = async (form) => {
   const product = await createProduct(form);
 
   try {
     await axiosInstance.post(API_ENDPOINTS.VARIANTS.CREATE, {
       product: product.id,
-      sku: barcode,
-      barcode,
+      sku: product.code,
     });
   } catch (err) {
     throw new Error(
-      `Product was saved, but the barcode was not: ${parseApiError(
+      `Product was saved, but its default variant was not: ${parseApiError(
         err,
-        "Could not save barcode"
-      )}`
+        "Could not create variant"
+      )}. Add the variant on the Variants page.`
     );
   }
   return product;

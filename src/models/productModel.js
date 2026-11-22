@@ -8,17 +8,19 @@ export const GST_RATES = [
 
 export const PRODUCT_PAGE_SIZE = 10;
 
-// The backend rejects a blank HSN/SAC code, and the Add Product form no
-// longer asks for it, so this default is sent instead. Change it if needed.
+export const BARCODE_MIN_QTY = 1;
+export const BARCODE_MAX_QTY = 1000;
+
+// The backend rejects a blank HSN/SAC code, and the Add Product form does not
+// ask for it, so this default is sent instead. Change it if needed.
 export const DEFAULT_HSN = "330499";
 
 const money = (v) => Number(v).toFixed(2);
 
-// The scanned barcode is sent as product_code (the backend requires it).
-// The barcode itself is saved on the variant by createProductWithBarcode.
+// The barcode is NOT sent: the backend generates it.
 export const toCreateProductPayload = (form) => {
   const payload = {
-    product_code: form.barcode.trim(),
+    product_code: form.code.trim(),
     name: form.name.trim(),
     category: form.category,
     description: form.description.trim(),
@@ -65,6 +67,7 @@ export const fromVariant = (v = {}) => ({
 export const fromProduct = (p = {}) => ({
   id: p.id,
   code: p.product_code || "",
+  barcode: p.barcode || "",
   name: p.name || "",
   description: p.description || "",
   hsn: p.hsn_sac_code || "",
@@ -96,6 +99,17 @@ export const fromProductList = (data, page = 1) => {
     pages: Math.max(1, Math.ceil(total / PRODUCT_PAGE_SIZE)),
   };
 };
+
+// Barcode label response: { quantity, labels: [{ product_id, product_name, barcode, format }] }
+export const fromBarcodeLabels = (data = {}) => ({
+  quantity: Number(data.quantity) || 0,
+  labels: (data.labels || []).map((l) => ({
+    productId: l.product_id,
+    name: l.product_name || "",
+    barcode: l.barcode || "",
+    format: l.format || "CODE128",
+  })),
+});
 
 export const formatINR = (v) =>
   v === "" || v == null

@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
     LIST: `${API_V1}/products/`,
     CREATE: `${API_V1}/products/`,
     DETAIL: (id) => `${API_V1}/products/${id}/`,
+    BARCODE_LABELS: (id) => `${API_V1}/products/${id}/barcode-labels/`,
   },
   VARIANTS: {
     LIST: `${API_V1}/variants/`,

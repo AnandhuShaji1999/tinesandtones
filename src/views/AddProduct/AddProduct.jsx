@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, ListChecks, Banknote, ChevronDown } from "lucide-react";
+import BarcodeSvg from "../../components/BarcodeSvg";
 import { PRODUCT_CONTENT } from "../../content/productContent";
 import { GST_RATES } from "../../models/productModel";
-import { createProductWithBarcode } from "../../controllers/productController";
+import { createProductWithVariant } from "../../controllers/productController";
 import { listCategoryOptions } from "../../controllers/categoryController";
 import { listSubcategoryOptions } from "../../controllers/subcategoryController";
 import { listBrandOptions } from "../../controllers/brandController";
 import { ROUTES } from "../../constants/routes";
 
 const EMPTY = {
-  barcode: "",
+  code: "",
   name: "",
   category: "",
   subcategory: "",
@@ -25,7 +26,7 @@ const EMPTY = {
 const AddProduct = () => {
   const c = PRODUCT_CONTENT;
   const navigate = useNavigate();
-  const barcodeRef = useRef(null);
+  const codeRef = useRef(null);
 
   const [form, setForm] = useState(EMPTY);
   const [categories, setCategories] = useState([]);
@@ -33,7 +34,7 @@ const AddProduct = () => {
   const [brands, setBrands] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [created, setCreated] = useState(null);
 
   useEffect(() => {
     listCategoryOptions().then(setCategories);
@@ -57,7 +58,7 @@ const AddProduct = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const v = type === "checkbox" ? checked : value;
-    if (name === "barcode") setSuccess("");
+    if (name === "code") setCreated(null);
     setForm((p) =>
       name === "category"
         ? { ...p, category: v, subcategory: "" }
@@ -68,15 +69,15 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
+    setCreated(null);
     setSaving(true);
     try {
-      await createProductWithBarcode(form);
-      setSuccess(c.saved);
-      // Clear only the barcode; every other field keeps its last value
-      setForm((p) => ({ ...p, barcode: "" }));
+      const product = await createProductWithVariant(form);
+      setCreated(product);
+      // Clear only the product code; every other field keeps its last value
+      setForm((p) => ({ ...p, code: "" }));
       window.scrollTo({ top: 0, behavior: "smooth" });
-      setTimeout(() => barcodeRef.current?.focus(), 0);
+      setTimeout(() => codeRef.current?.focus(), 0);
     } catch (err) {
       setError(err.message);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -91,7 +92,31 @@ const AddProduct = () => {
       <p className="ap-subtitle">{c.subtitle}</p>
 
       {error && <p className="ap-error">{error}</p>}
-      {success && <p className="ap-success">{success}</p>}
+
+      {created && (
+        <div className="ap-created">
+          <div className="ap-created-t">
+            <b>{c.created.title}</b>
+            <span>
+              {created.name} · {created.code}
+            </span>
+            <small>{c.created.barcodeLabel}</small>
+            <code>{created.barcode || "-"}</code>
+          </div>
+          {created.barcode && (
+            <div className="ap-created-bar">
+              <BarcodeSvg value={created.barcode} height={46} />
+            </div>
+          )}
+          <button
+            type="button"
+            className="ap-created-btn"
+            onClick={() => navigate(ROUTES.BARCODES)}
+          >
+            {c.created.print}
+          </button>
+        </div>
+      )}
 
       <div className="ap-card">
         <h3 className="ap-section">
@@ -101,21 +126,17 @@ const AddProduct = () => {
 
         <div className="ap-grid">
           <div className="ap-field">
-            <label>{c.basic.barcode.label}</label>
+            <label>{c.basic.code.label}</label>
             <input
-              ref={barcodeRef}
+              ref={codeRef}
               className="ap-input ap-mono"
               type="text"
-              name="barcode"
-              value={form.barcode}
+              name="code"
+              value={form.code}
               onChange={handleChange}
-              onKeyDown={(e) => {
-                // Scanners send Enter after the code; don't submit the form
-                if (e.key === "Enter") e.preventDefault();
-              }}
-              placeholder={c.basic.barcode.placeholder}
-              autoFocus
+              placeholder={c.basic.code.placeholder}
               autoComplete="off"
+              autoFocus
               required
             />
           </div>

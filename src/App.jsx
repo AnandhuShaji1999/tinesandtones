@@ -8,6 +8,7 @@ import Exchanges from "./views/Exchanges/Exchanges";
 import Products from "./views/Products/Products";
 import AddProduct from "./views/AddProduct/AddProduct";
 import Variants from "./views/Variants/Variants";
+import Barcodes from "./views/Barcodes/Barcodes";
 import Suppliers from "./views/Suppliers/Suppliers";
 import Purchases from "./views/Purchases/Purchases";
 import AddPurchase from "./views/Purchases/AddPurchase";
@@ -36,6 +37,7 @@ const App = () => (
       <Route path={ROUTES.PRODUCTS} element={<Products />} />
       <Route path={ROUTES.ADD_PRODUCT} element={<AddProduct />} />
       <Route path={ROUTES.VARIANTS} element={<Variants />} />
+      <Route path={ROUTES.BARCODES} element={<Barcodes />} />
       <Route path={ROUTES.SUPPLIERS} element={<Suppliers />} />
       <Route path={ROUTES.PURCHASES} element={<Purchases />} />
       <Route path={ROUTES.ADD_PURCHASE} element={<AddPurchase />} />

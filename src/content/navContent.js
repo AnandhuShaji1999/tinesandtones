@@ -5,6 +5,7 @@ import {
   Repeat,
   ChartNoAxesColumn,
   Layers,
+  Barcode,
   Truck,
   ReceiptText,
   Boxes,
@@ -47,6 +48,7 @@ export const NAV_GROUPS = [
     children: [
       { label: "Product Management", title: "Product Database", path: ROUTES.PRODUCTS, icon: ChartNoAxesColumn },
       { label: "Variants", title: "Variant Database", path: ROUTES.VARIANTS, icon: Layers },
+      { label: "Barcodes", title: "Barcode Labels", path: ROUTES.BARCODES, icon: Barcode },
       { label: "Categories", title: "Category Database", path: ROUTES.CATEGORIES, icon: Tags },
       { label: "Brands", title: "Brand Database", path: ROUTES.BRANDS, icon: Award },
       { label: "Stock", title: "Stock Audit List", path: ROUTES.STOCK, icon: Boxes },

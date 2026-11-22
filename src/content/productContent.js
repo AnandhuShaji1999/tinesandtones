@@ -3,7 +3,7 @@ export const PRODUCT_CONTENT = {
   subtitle: "Enter comprehensive product specifications, pricing, and tax details.",
   basic: {
     title: "Basic Information",
-    barcode: { label: "Barcode", placeholder: "Scan or enter barcode" },
+    code: { label: "Product Code", placeholder: "e.g. PRD-001" },
     name: { label: "Product Name", placeholder: "Enter product name" },
     category: { label: "Category", placeholder: "Select category" },
     subcategory: {
@@ -12,7 +12,6 @@ export const PRODUCT_CONTENT = {
       selectCategoryFirst: "Select category first",
     },
     description: { label: "Description", placeholder: "Detailed product description..." },
-    hsn: { label: "HSN/SAC Code", placeholder: "e.g. 330499" },
   },
   details: {
     title: "Product Details",
@@ -28,8 +27,12 @@ export const PRODUCT_CONTENT = {
     purchase: { label: "Purchase Price (₹)", placeholder: "0.00" },
     retail: { label: "Retail Price (₹, GST inclusive)", placeholder: "0.00" },
   },
+  created: {
+    title: "Product saved",
+    barcodeLabel: "Generated barcode",
+    print: "Print barcode labels",
+  },
   cancel: "Cancel",
   save: "Save Product",
   saving: "Saving...",
-  saved: "Product saved. Scan the next barcode.",
 };
