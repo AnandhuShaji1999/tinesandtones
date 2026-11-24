@@ -2107,3 +2107,9 @@ body {
 .sb-foot { flex-shrink: 0; padding: 10px 4px 16px 0; border-top: 1px solid #eef0f7; }
 .sb-out { color: #c0392b; }
 .sb-out:hover { background: #fde4e2; color: #c0392b; }
+
+/* Sidebar: stop menu items from shrinking */
+.sb-nav > *,
+.sb-group > * { flex-shrink: 0; }
+.sb-item { flex-shrink: 0; min-height: 42px; }
+.sb-sub { flex-shrink: 0; }
