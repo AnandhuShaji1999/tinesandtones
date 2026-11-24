@@ -13,6 +13,7 @@ import {
   fromCustomer,
   fromCustomerList,
 } from "../models/billingModel";
+import { buildReceiptHtml, buildReceiptPdf } from "../utils/receiptDocs";
 
 /* Items */
 export const searchSellable = async (q = "") => {
@@ -85,33 +86,26 @@ export const findInvoice = async (invoiceNumber) => {
   }
 };
 
-// Downloads the PDF
+// Download: the PDF is built in the app with the Tints & Tones shop details
 export const downloadSalePdf = async (id, invoiceNumber) => {
-  try {
-    const blob = await billingService.getSalePdf(id);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `invoice-${invoiceNumber || id}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    throw new Error(parseApiError(err, "Could not download the PDF"));
-  }
+  const sale = await getSale(id);
+  buildReceiptPdf(sale).save(`invoice-${invoiceNumber || sale.invoiceNumber || id}.pdf`);
 };
 
-// Opens the PDF in the tab that was opened by the click (avoids popup blockers)
+// View: the bill is built in the app and shown in a new tab
 export const viewSalePdf = async (id, win) => {
+  let sale;
   try {
-    const blob = await billingService.getSalePdf(id);
-    const url = URL.createObjectURL(blob);
-    if (win) win.location.href = url;
-    else window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    sale = await getSale(id);
   } catch (err) {
     if (win) win.close();
-    throw new Error(parseApiError(err, "Could not open the PDF"));
+    throw err;
   }
+  const target = win || window.open("", "_blank");
+  if (!target) throw new Error("Allow popups to view the bill.");
+  target.document.open();
+  target.document.write(buildReceiptHtml(sale));
+  target.document.close();
 };
 
 /* Branch GST */

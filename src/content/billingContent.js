@@ -2,7 +2,7 @@ export const BILLING_CONTENT = {
   title: "POS Billing",
   shop: {
     name: "Tints & Tones",
-    address: "Tints & Tones Thodupuzha",
+    address: ["Market road", "Thodupuzha", "Pin code : 685584"],
   },
   tabs: { new: "New Bill", history: "Sales History" },
   branch: { label: "Branch", placeholder: "Select branch", id: "Branch ID" },

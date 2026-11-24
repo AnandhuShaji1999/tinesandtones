@@ -17,7 +17,11 @@ const Receipt = ({ sale }) => {
     <div className="rc-print">
       <div className="rc-box">
         <h1 className="rc-shop">{c.shop.name}</h1>
-        <p className="rc-addr">{c.shop.address}</p>
+        {c.shop.address.map((a) => (
+          <p className="rc-addr" style={{ margin: 0 }} key={a}>
+            {a}
+          </p>
+        ))}
         <hr />
 
         <div className="rc-meta">
