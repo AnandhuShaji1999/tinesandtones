@@ -6,13 +6,11 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Building2,
-  ChevronDown,
   ArrowRight,
   ShieldCheck,
   Headset,
 } from "lucide-react";
-import { LOGIN_CONTENT, BRANCHES } from "../../content/loginContent";
+import { LOGIN_CONTENT } from "../../content/loginContent";
 import { login } from "../../controllers/authController";
 import { ROUTES } from "../../constants/routes";
 
@@ -21,17 +19,15 @@ const Login = () => {
   const [form, setForm] = useState({
     username: "",
     password: "",
-    branch: BRANCHES[0].value,
     remember: true,
-    quickPin: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((p) => ({ ...p, [name]: type === "checkbox" ? checked : value }));
+    const { name, value } = e.target;
+    setForm((p) => ({ ...p, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -93,6 +89,7 @@ const Login = () => {
                 value={form.username}
                 onChange={handleChange}
                 placeholder={c.fields.username.placeholder}
+                autoComplete="username"
                 required
               />
             </div>
@@ -113,6 +110,7 @@ const Login = () => {
                 value={form.password}
                 onChange={handleChange}
                 placeholder={c.fields.password.placeholder}
+                autoComplete="current-password"
                 required
               />
               <button
@@ -122,41 +120,6 @@ const Login = () => {
               >
                 {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
-            </div>
-
-            <label className="field-label">{c.fields.branch.label}</label>
-            <div className="input-wrap">
-              <Building2 size={16} className="input-icon" />
-              <select name="branch" value={form.branch} onChange={handleChange}>
-                {BRANCHES.map((b) => (
-                  <option key={b.value} value={b.value}>
-                    {b.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={16} className="select-arrow" />
-            </div>
-
-            <div className="options-row">
-              <label className="remember">
-                <input
-                  type="checkbox"
-                  name="remember"
-                  checked={form.remember}
-                  onChange={handleChange}
-                />
-                <span>{c.rememberStation}</span>
-              </label>
-              <label className="quick-pin">
-                <input
-                  type="checkbox"
-                  name="quickPin"
-                  checked={form.quickPin}
-                  onChange={handleChange}
-                />
-                <span className="radio-dot" />
-                {c.quickPin}
-              </label>
             </div>
 
             {error && <p className="form-error">{error}</p>}
