@@ -23,6 +23,10 @@ const DashboardLayout = () => {
       .catch(() => {});
   }, []);
 
+  // Only the business admin sees the admin-only items
+  const isAdmin = Boolean(profile?.isAdmin);
+  const menu = NAV_GROUPS.filter((g) => !g.adminOnly || isAdmin);
+
   // Open the group that contains the current page
   useEffect(() => {
     const g = NAV_GROUPS.find(
@@ -73,7 +77,7 @@ const DashboardLayout = () => {
         </div>
 
         <nav className="sb-nav">
-          {NAV_GROUPS.map((item) => {
+          {menu.map((item) => {
             if (item.type === "link") {
               const Icon = item.icon;
               return (

@@ -2113,3 +2113,8 @@ body {
 .sb-group > * { flex-shrink: 0; }
 .sb-item { flex-shrink: 0; min-height: 42px; }
 .sb-sub { flex-shrink: 0; }
+
+/* Sidebar: keep labels on one line */
+.sb-item { padding: 0 14px; gap: 12px; }
+.sb-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-parent span { flex: 1; }

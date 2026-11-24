@@ -21,6 +21,7 @@ import Sales from "./views/Sales/Sales";
 import Customers from "./views/Customers/Customers";
 import System from "./views/System/System";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import RequireAdmin from "./components/RequireAdmin";
 import { ROUTES } from "./constants/routes";
 
 const App = () => (
@@ -29,6 +30,7 @@ const App = () => (
     <Route path={ROUTES.LOGIN} element={<Login />} />
 
     <Route element={<DashboardLayout />}>
+      {/* All users */}
       <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
       <Route path={ROUTES.PROFILE} element={<Profile />} />
       <Route path={ROUTES.REPORTS} element={<Reports />} />
@@ -37,19 +39,23 @@ const App = () => (
       <Route path={ROUTES.PRODUCTS} element={<Products />} />
       <Route path={ROUTES.ADD_PRODUCT} element={<AddProduct />} />
       <Route path={ROUTES.VARIANTS} element={<Variants />} />
-      <Route path={ROUTES.BARCODES} element={<Barcodes />} />
-      <Route path={ROUTES.SUPPLIERS} element={<Suppliers />} />
-      <Route path={ROUTES.PURCHASES} element={<Purchases />} />
-      <Route path={ROUTES.ADD_PURCHASE} element={<AddPurchase />} />
-      <Route path={ROUTES.EDIT_PURCHASE} element={<AddPurchase />} />
       <Route path={ROUTES.STOCK} element={<Stock />} />
       <Route path={ROUTES.STOCK_AUDITS} element={<StockAudits />} />
       <Route path={ROUTES.CATEGORIES} element={<Categories />} />
       <Route path={ROUTES.BRANDS} element={<Brands />} />
-      <Route path={ROUTES.EMPLOYEES} element={<Staff />} />
       <Route path={ROUTES.SALES} element={<Sales />} />
       <Route path={ROUTES.CUSTOMERS} element={<Customers />} />
       <Route path={ROUTES.SYSTEM} element={<System />} />
+
+      {/* Business admin only: Barcodes, Procurement, Administration */}
+      <Route element={<RequireAdmin />}>
+        <Route path={ROUTES.BARCODES} element={<Barcodes />} />
+        <Route path={ROUTES.SUPPLIERS} element={<Suppliers />} />
+        <Route path={ROUTES.PURCHASES} element={<Purchases />} />
+        <Route path={ROUTES.ADD_PURCHASE} element={<AddPurchase />} />
+        <Route path={ROUTES.EDIT_PURCHASE} element={<AddPurchase />} />
+        <Route path={ROUTES.EMPLOYEES} element={<Staff />} />
+      </Route>
     </Route>
 
     <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />

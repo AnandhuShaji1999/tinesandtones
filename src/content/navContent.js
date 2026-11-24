@@ -25,6 +25,7 @@ import {
 import { ROUTES } from "../constants/routes";
 
 // type "link" = single item, type "group" = parent with sub-items
+// adminOnly: true = shown only to the business admin
 export const NAV_GROUPS = [
   { type: "link", label: "Dashboard", title: "Dashboard", path: ROUTES.DASHBOARD, icon: ChartPie },
   { type: "link", label: "Reports", title: "Reports", path: ROUTES.REPORTS, icon: FileText },
@@ -52,7 +53,14 @@ export const NAV_GROUPS = [
       { label: "Brands", title: "Brand Database", path: ROUTES.BRANDS, icon: Award },
     ],
   },
-  { type: "link", label: "Barcodes", title: "Barcode Labels", path: ROUTES.BARCODES, icon: Barcode },
+  {
+    type: "link",
+    label: "Barcodes",
+    title: "Barcode Labels",
+    path: ROUTES.BARCODES,
+    icon: Barcode,
+    adminOnly: true,
+  },
   {
     type: "group",
     key: "stock",
@@ -68,6 +76,7 @@ export const NAV_GROUPS = [
     key: "procurement",
     label: "Procurement",
     icon: Truck,
+    adminOnly: true,
     children: [
       { label: "Suppliers", title: "Supplier Database", path: ROUTES.SUPPLIERS, icon: Truck },
       { label: "Purchases", title: "Purchase Database", path: ROUTES.PURCHASES, icon: ReceiptText },
@@ -78,6 +87,7 @@ export const NAV_GROUPS = [
     key: "admin",
     label: "Administration",
     icon: ShieldCheck,
+    adminOnly: true,
     children: [
       { label: "Employee Management", title: "Staff Database", path: ROUTES.EMPLOYEES, icon: Users },
     ],
@@ -88,6 +98,11 @@ export const NAV_GROUPS = [
 // Flat list (used for the topbar title)
 export const NAV_ITEMS = NAV_GROUPS.flatMap((g) =>
   g.type === "group" ? g.children : [g]
+);
+
+// Paths only the business admin may open (used by the route guard)
+export const ADMIN_PATHS = NAV_GROUPS.filter((g) => g.adminOnly).flatMap((g) =>
+  g.type === "group" ? g.children.map((c) => c.path) : [g.path]
 );
 
 export const SIGN_OUT = { label: "Sign Out", icon: LogOut };
