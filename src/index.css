@@ -2064,3 +2064,46 @@ body {
   .rc-small { font-size: 9px; text-align: right; }
   .rc-thanks { text-align: center; margin-top: 4px; }
 }
+/* ================= SIDEBAR (final) ================= */
+.sidebar {
+  display: flex; flex-direction: column; overflow: hidden;
+  padding: 0 14px 0 14px;
+}
+.sb-brand { height: 76px; flex-shrink: 0; border-bottom: 1px solid #eef0f7; margin-bottom: 10px; }
+.sb-brand-l { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.sb-brand-t { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.sb-brand-t b { font-size: 15px; color: #0f1538; white-space: nowrap; }
+.sb-brand-t small { font-size: 10.5px; color: #8a90b0; letter-spacing: 0.3px; }
+
+.sb-nav {
+  flex: 1; min-height: 0; overflow-y: auto; gap: 4px; padding: 4px 4px 12px 0;
+  scrollbar-width: thin; scrollbar-color: #d5dbee transparent;
+}
+.sb-nav::-webkit-scrollbar { width: 6px; }
+.sb-nav::-webkit-scrollbar-thumb { background: #d5dbee; border-radius: 6px; }
+
+.sb-item {
+  height: 42px; gap: 14px; padding: 0 16px; font-size: 13px; font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+.sb-item svg { flex-shrink: 0; }
+.sb-item:hover { background: #f1f4fc; color: #1c2250; }
+.sb-item.active { box-shadow: 0 8px 20px rgba(27, 85, 198, 0.28); }
+.sb-item.active:hover { background: #1b55c6; color: #fff; }
+
+.sb-parent.has-active { background: #eef3fd; color: #1b55c6; font-weight: 600; }
+.sb-parent .sb-chev { opacity: 0.7; }
+
+.sb-sub { position: relative; gap: 2px; margin: 2px 0 8px 28px; padding-left: 12px; border-left: 2px solid #e4e8f4; }
+.sb-subitem { position: relative; height: 36px; padding: 0 12px; font-size: 12.5px; font-weight: 500; }
+.sb-subitem::before {
+  content: ""; position: absolute; left: -14px; top: 50%; width: 10px; height: 2px;
+  background: #e4e8f4; transform: translateY(-50%);
+}
+.sb-subitem:hover { background: #f1f4fc; color: #1c2250; }
+.sb-subitem.active { background: #1b55c6; color: #fff; }
+.sb-subitem.active::before { background: #1b55c6; }
+
+.sb-foot { flex-shrink: 0; padding: 10px 4px 16px 0; border-top: 1px solid #eef0f7; }
+.sb-out { color: #c0392b; }
+.sb-out:hover { background: #fde4e2; color: #c0392b; }

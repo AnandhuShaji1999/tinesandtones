@@ -55,7 +55,13 @@ const DashboardLayout = () => {
 
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <div className="sb-brand">
-          <img src="/logo.jpeg" alt="Tints & Tones" className="sb-logo" />
+          <div className="sb-brand-l">
+            <img src="/logo.jpeg" alt="Tints & Tones" className="sb-logo" />
+            <div className="sb-brand-t">
+              <b>Tints &amp; Tones</b>
+              <small>POS &amp; Inventory</small>
+            </div>
+          </div>
           <button
             type="button"
             className="sb-close"
@@ -123,12 +129,14 @@ const DashboardLayout = () => {
               </div>
             );
           })}
+        </nav>
 
-          <button type="button" className="sb-item" onClick={handleSignOut}>
+        <div className="sb-foot">
+          <button type="button" className="sb-item sb-out" onClick={handleSignOut}>
             <SignOutIcon size={18} strokeWidth={1.6} />
             <span>{SIGN_OUT.label}</span>
           </button>
-        </nav>
+        </div>
       </aside>
 
       <div className="main">
