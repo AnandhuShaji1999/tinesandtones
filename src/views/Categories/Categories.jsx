@@ -17,10 +17,16 @@ import {
   updateSubcategory,
   deactivateSubcategory,
 } from "../../controllers/subcategoryController";
+import { useIsAdmin } from "../../hooks/useIsAdmin";
 
 const Categories = () => {
   const c = CATEGORY_CONTENT;
   const s = SUBCATEGORY_CONTENT;
+  const isAdmin = useIsAdmin();
+
+  // The last column is the Actions column; only the admin sees it
+  const catColumns = isAdmin ? c.list.columns : c.list.columns.slice(0, -1);
+  const subColumns = isAdmin ? s.list.columns : s.list.columns.slice(0, -1);
 
   /* ---------------- Categories ---------------- */
   const [name, setName] = useState("");
@@ -230,49 +236,51 @@ const Categories = () => {
       <h2 className="st-title">{c.title}</h2>
       <p className="st-subtitle">{c.subtitle}</p>
 
-      {/* ============ Category form ============ */}
-      <form className="st-card" onSubmit={handleSubmit}>
-        <h3 className="st-card-title">
-          {editingId ? <Pencil size={18} /> : <Plus size={18} />}
-          {editingId ? c.form.editTitle : c.form.createTitle}
-        </h3>
+      {/* ============ Category form (admin only) ============ */}
+      {isAdmin && (
+        <form className="st-card" onSubmit={handleSubmit}>
+          <h3 className="st-card-title">
+            {editingId ? <Pencil size={18} /> : <Plus size={18} />}
+            {editingId ? c.form.editTitle : c.form.createTitle}
+          </h3>
 
-        <div className="cat-form-row">
-          <div className="f-field">
-            <label>{c.form.name.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={c.form.name.placeholder}
-                required
-              />
+          <div className="cat-form-row">
+            <div className="f-field">
+              <label>{c.form.name.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={c.form.name.placeholder}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="cat-form-btns">
+              {editingId && (
+                <button type="button" className="st-reset" onClick={resetForm}>
+                  {c.form.cancel}
+                </button>
+              )}
+              <button type="submit" className="st-submit" disabled={saving}>
+                {saving
+                  ? c.form.saving
+                  : editingId
+                  ? c.form.update
+                  : c.form.create}
+              </button>
             </div>
           </div>
 
-          <div className="cat-form-btns">
-            {editingId && (
-              <button type="button" className="st-reset" onClick={resetForm}>
-                {c.form.cancel}
-              </button>
-            )}
-            <button type="submit" className="st-submit" disabled={saving}>
-              {saving
-                ? c.form.saving
-                : editingId
-                ? c.form.update
-                : c.form.create}
-            </button>
-          </div>
-        </div>
-
-        {error && <p className="st-msg st-error">{error}</p>}
-        {success && <p className="st-msg st-success">{success}</p>}
-      </form>
+          {error && <p className="st-msg st-error">{error}</p>}
+          {success && <p className="st-msg st-success">{success}</p>}
+        </form>
+      )}
 
       {/* ============ Category list ============ */}
-      <div className="st-card st-list">
+      <div className={`st-card ${isAdmin ? "st-list" : ""}`}>
         <h3 className="st-card-title">{c.list.title}</h3>
 
         <form className="cat-toolbar" onSubmit={handleSearch}>
@@ -308,7 +316,7 @@ const Categories = () => {
               <table className="st-tbl cat-tbl">
                 <thead>
                   <tr>
-                    {c.list.columns.map((col) => (
+                    {catColumns.map((col) => (
                       <th key={col}>{col}</th>
                     ))}
                   </tr>
@@ -316,7 +324,7 @@ const Categories = () => {
                 <tbody>
                   {list.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={c.list.columns.length} className="st-empty">
+                      <td colSpan={catColumns.length} className="st-empty">
                         {c.list.empty}
                       </td>
                     </tr>
@@ -334,26 +342,28 @@ const Categories = () => {
                             {cat.isActive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td>
-                          <div className="cat-actions">
-                            <button
-                              type="button"
-                              className="cat-edit"
-                              onClick={() => handleEdit(cat)}
-                            >
-                              {c.list.edit}
-                            </button>
-                            {cat.isActive && (
+                        {isAdmin && (
+                          <td>
+                            <div className="cat-actions">
                               <button
                                 type="button"
-                                className="st-deact"
-                                onClick={() => handleDeactivate(cat.id)}
+                                className="cat-edit"
+                                onClick={() => handleEdit(cat)}
                               >
-                                {c.list.deactivate}
+                                {c.list.edit}
                               </button>
-                            )}
-                          </div>
-                        </td>
+                              {cat.isActive && (
+                                <button
+                                  type="button"
+                                  className="st-deact"
+                                  onClick={() => handleDeactivate(cat.id)}
+                                >
+                                  {c.list.deactivate}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
@@ -386,75 +396,77 @@ const Categories = () => {
         )}
       </div>
 
-      {/* ============ Subcategory form ============ */}
-      <form
-        id="subcategory-form"
-        className="st-card st-list"
-        onSubmit={handleSubSubmit}
-      >
-        <h3 className="st-card-title">
-          {subEditingId ? <Pencil size={18} /> : <Plus size={18} />}
-          {subEditingId ? s.form.editTitle : s.form.createTitle}
-        </h3>
+      {/* ============ Subcategory form (admin only) ============ */}
+      {isAdmin && (
+        <form
+          id="subcategory-form"
+          className="st-card st-list"
+          onSubmit={handleSubSubmit}
+        >
+          <h3 className="st-card-title">
+            {subEditingId ? <Pencil size={18} /> : <Plus size={18} />}
+            {subEditingId ? s.form.editTitle : s.form.createTitle}
+          </h3>
 
-        <div className="sub-form-row">
-          <div className="f-field">
-            <label>{s.form.category.label}</label>
-            <div className="f-control">
-              <select
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                disabled={Boolean(subEditingId)}
-                required
-              >
-                <option value="">{s.form.category.placeholder}</option>
-                {catOptions.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={18} className="f-icon" />
+          <div className="sub-form-row">
+            <div className="f-field">
+              <label>{s.form.category.label}</label>
+              <div className="f-control">
+                <select
+                  value={subCategory}
+                  onChange={(e) => setSubCategory(e.target.value)}
+                  disabled={Boolean(subEditingId)}
+                  required
+                >
+                  <option value="">{s.form.category.placeholder}</option>
+                  {catOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={18} className="f-icon" />
+              </div>
             </div>
-          </div>
 
-          <div className="f-field">
-            <label>{s.form.name.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                value={subName}
-                onChange={(e) => setSubName(e.target.value)}
-                placeholder={s.form.name.placeholder}
-                required
-              />
+            <div className="f-field">
+              <label>{s.form.name.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  value={subName}
+                  onChange={(e) => setSubName(e.target.value)}
+                  placeholder={s.form.name.placeholder}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="cat-form-btns">
-            {subEditingId && (
-              <button
-                type="button"
-                className="st-reset"
-                onClick={resetSubForm}
-              >
-                {s.form.cancel}
+            <div className="cat-form-btns">
+              {subEditingId && (
+                <button
+                  type="button"
+                  className="st-reset"
+                  onClick={resetSubForm}
+                >
+                  {s.form.cancel}
+                </button>
+              )}
+              <button type="submit" className="st-submit" disabled={subSaving}>
+                {subSaving
+                  ? s.form.saving
+                  : subEditingId
+                  ? s.form.update
+                  : s.form.create}
               </button>
-            )}
-            <button type="submit" className="st-submit" disabled={subSaving}>
-              {subSaving
-                ? s.form.saving
-                : subEditingId
-                ? s.form.update
-                : s.form.create}
-            </button>
+            </div>
           </div>
-        </div>
 
-        {subEditingId && <p className="st-msg cat-note">{s.form.editNote}</p>}
-        {subError && <p className="st-msg st-error">{subError}</p>}
-        {subSuccess && <p className="st-msg st-success">{subSuccess}</p>}
-      </form>
+          {subEditingId && <p className="st-msg cat-note">{s.form.editNote}</p>}
+          {subError && <p className="st-msg st-error">{subError}</p>}
+          {subSuccess && <p className="st-msg st-success">{subSuccess}</p>}
+        </form>
+      )}
 
       {/* ============ Subcategory list ============ */}
       <div className="st-card st-list">
@@ -512,7 +524,7 @@ const Categories = () => {
               <table className="st-tbl cat-tbl">
                 <thead>
                   <tr>
-                    {s.list.columns.map((col) => (
+                    {subColumns.map((col) => (
                       <th key={col}>{col}</th>
                     ))}
                   </tr>
@@ -520,7 +532,7 @@ const Categories = () => {
                 <tbody>
                   {subList.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={s.list.columns.length} className="st-empty">
+                      <td colSpan={subColumns.length} className="st-empty">
                         {s.list.empty}
                       </td>
                     </tr>
@@ -539,26 +551,28 @@ const Categories = () => {
                             {sub.isActive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td>
-                          <div className="cat-actions">
-                            <button
-                              type="button"
-                              className="cat-edit"
-                              onClick={() => handleSubEdit(sub)}
-                            >
-                              {s.list.edit}
-                            </button>
-                            {sub.isActive && (
+                        {isAdmin && (
+                          <td>
+                            <div className="cat-actions">
                               <button
                                 type="button"
-                                className="st-deact"
-                                onClick={() => handleSubDeactivate(sub.id)}
+                                className="cat-edit"
+                                onClick={() => handleSubEdit(sub)}
                               >
-                                {s.list.deactivate}
+                                {s.list.edit}
                               </button>
-                            )}
-                          </div>
-                        </td>
+                              {sub.isActive && (
+                                <button
+                                  type="button"
+                                  className="st-deact"
+                                  onClick={() => handleSubDeactivate(sub.id)}
+                                >
+                                  {s.list.deactivate}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}

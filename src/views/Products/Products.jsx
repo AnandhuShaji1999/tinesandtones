@@ -23,6 +23,7 @@ import {
 import { listCategoryOptions } from "../../controllers/categoryController";
 import { listSubcategoryOptions } from "../../controllers/subcategoryController";
 import { listBrandOptions } from "../../controllers/brandController";
+import { useIsAdmin } from "../../hooks/useIsAdmin";
 import { ROUTES } from "../../constants/routes";
 
 const EMPTY_FILTERS = { search: "", category: "", subcategory: "", brand: "" };
@@ -45,6 +46,10 @@ const pageList = (page, pages) => {
 const Products = () => {
   const c = PRODUCT_LIST_CONTENT;
   const navigate = useNavigate();
+  const isAdmin = useIsAdmin();
+
+  // The last column is the Actions column; only the admin sees it
+  const columns = isAdmin ? c.columns : c.columns.slice(0, -1);
 
   const [draft, setDraft] = useState(EMPTY_FILTERS);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
@@ -193,19 +198,21 @@ const Products = () => {
           <h2 className="st-title">{c.title}</h2>
           <p className="st-subtitle pr-sub">{c.subtitle}</p>
         </div>
-        <button
-          type="button"
-          className="sl-add"
-          onClick={() => navigate(ROUTES.ADD_PRODUCT)}
-        >
-          <Plus size={15} />
-          {c.add}
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            className="sl-add"
+            onClick={() => navigate(ROUTES.ADD_PRODUCT)}
+          >
+            <Plus size={15} />
+            {c.add}
+          </button>
+        )}
       </div>
 
       {success && <p className="st-msg st-success pr-top">{success}</p>}
 
-      {editing && form && (
+      {isAdmin && editing && form && (
         <form className="st-card pr-edit" onSubmit={handleUpdate}>
           <h3 className="st-card-title">
             <Pencil size={18} />
@@ -400,7 +407,7 @@ const Products = () => {
               <table className="st-tbl pr-tbl">
                 <thead>
                   <tr>
-                    {c.columns.map((col) => (
+                    {columns.map((col) => (
                       <th key={col}>{col}</th>
                     ))}
                   </tr>
@@ -408,7 +415,7 @@ const Products = () => {
                 <tbody>
                   {list.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={c.columns.length} className="st-empty">
+                      <td colSpan={columns.length} className="st-empty">
                         {c.empty}
                       </td>
                     </tr>
@@ -447,26 +454,28 @@ const Products = () => {
                             {p.isActive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td>
-                          <div className="cat-actions">
-                            <button
-                              type="button"
-                              className="cat-edit"
-                              onClick={() => startEdit(p)}
-                            >
-                              Edit
-                            </button>
-                            {p.isActive && (
+                        {isAdmin && (
+                          <td>
+                            <div className="cat-actions">
                               <button
                                 type="button"
-                                className="st-deact"
-                                onClick={() => handleDeactivate(p.id)}
+                                className="cat-edit"
+                                onClick={() => startEdit(p)}
                               >
-                                Deactivate
+                                Edit
                               </button>
-                            )}
-                          </div>
-                        </td>
+                              {p.isActive && (
+                                <button
+                                  type="button"
+                                  className="st-deact"
+                                  onClick={() => handleDeactivate(p.id)}
+                                >
+                                  Deactivate
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}

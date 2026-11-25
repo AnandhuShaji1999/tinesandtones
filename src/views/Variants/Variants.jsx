@@ -8,6 +8,7 @@ import {
   deactivateVariant,
 } from "../../controllers/variantController";
 import { listProductOptions } from "../../controllers/productController";
+import { useIsAdmin } from "../../hooks/useIsAdmin";
 
 const EMPTY = {
   product: "",
@@ -17,19 +18,14 @@ const EMPTY = {
   color: "",
 };
 
-// SKU column removed (the barcode is shown instead)
-const COLUMNS = [
-  "Barcode",
-  "Product",
-  "Shade",
-  "Size",
-  "Color",
-  "Status",
-  "Actions",
-];
+const READ_COLUMNS = ["Barcode", "Product", "Shade", "Size", "Color", "Status"];
+const COLUMNS = [...READ_COLUMNS, "Actions"];
 
 const Variants = () => {
   const c = VARIANT_CONTENT;
+  const isAdmin = useIsAdmin();
+  const columns = isAdmin ? COLUMNS : READ_COLUMNS;
+
   const [form, setForm] = useState(EMPTY);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -145,114 +141,116 @@ const Variants = () => {
       <h2 className="st-title">{c.title}</h2>
       <p className="st-subtitle">{c.subtitle}</p>
 
-      <form className="st-card" onSubmit={handleSubmit}>
-        <h3 className="st-card-title">
-          {editingId ? <Pencil size={18} /> : <Plus size={18} />}
-          {editingId ? c.form.editTitle : c.form.createTitle}
-        </h3>
+      {isAdmin && (
+        <form className="st-card" onSubmit={handleSubmit}>
+          <h3 className="st-card-title">
+            {editingId ? <Pencil size={18} /> : <Plus size={18} />}
+            {editingId ? c.form.editTitle : c.form.createTitle}
+          </h3>
 
-        <div className="st-grid">
-          <div className="f-field">
-            <label>{c.form.product.label}</label>
-            <div className="f-control">
-              <select
-                name="product"
-                value={form.product}
-                onChange={handleChange}
-                disabled={Boolean(editingId)}
-                required
-              >
-                <option value="">{c.form.product.placeholder}</option>
-                {products.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={18} className="f-icon" />
+          <div className="st-grid">
+            <div className="f-field">
+              <label>{c.form.product.label}</label>
+              <div className="f-control">
+                <select
+                  name="product"
+                  value={form.product}
+                  onChange={handleChange}
+                  disabled={Boolean(editingId)}
+                  required
+                >
+                  <option value="">{c.form.product.placeholder}</option>
+                  {products.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={18} className="f-icon" />
+              </div>
+            </div>
+
+            <div className="f-field">
+              <label>{c.form.barcode.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  name="barcode"
+                  value={form.barcode}
+                  onChange={handleChange}
+                  onKeyDown={(e) => {
+                    // Scanners send Enter after the code; don't submit the form
+                    if (e.key === "Enter") e.preventDefault();
+                  }}
+                  placeholder={c.form.barcode.placeholder}
+                  autoComplete="off"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="f-field">
+              <label>{c.form.shade.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  name="shade"
+                  value={form.shade}
+                  onChange={handleChange}
+                  placeholder={c.form.shade.placeholder}
+                />
+              </div>
+            </div>
+
+            <div className="f-field">
+              <label>{c.form.size.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  name="size"
+                  value={form.size}
+                  onChange={handleChange}
+                  placeholder={c.form.size.placeholder}
+                />
+              </div>
+            </div>
+
+            <div className="f-field">
+              <label>{c.form.color.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  name="color"
+                  value={form.color}
+                  onChange={handleChange}
+                  placeholder={c.form.color.placeholder}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="f-field">
-            <label>{c.form.barcode.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                name="barcode"
-                value={form.barcode}
-                onChange={handleChange}
-                onKeyDown={(e) => {
-                  // Scanners send Enter after the code; don't submit the form
-                  if (e.key === "Enter") e.preventDefault();
-                }}
-                placeholder={c.form.barcode.placeholder}
-                autoComplete="off"
-                required
-              />
-            </div>
-          </div>
+          {editingId && <p className="st-msg cat-note">{c.form.editNote}</p>}
+          {error && <p className="st-msg st-error">{error}</p>}
+          {success && <p className="st-msg st-success">{success}</p>}
 
-          <div className="f-field">
-            <label>{c.form.shade.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                name="shade"
-                value={form.shade}
-                onChange={handleChange}
-                placeholder={c.form.shade.placeholder}
-              />
-            </div>
-          </div>
-
-          <div className="f-field">
-            <label>{c.form.size.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                name="size"
-                value={form.size}
-                onChange={handleChange}
-                placeholder={c.form.size.placeholder}
-              />
-            </div>
-          </div>
-
-          <div className="f-field">
-            <label>{c.form.color.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                name="color"
-                value={form.color}
-                onChange={handleChange}
-                placeholder={c.form.color.placeholder}
-              />
-            </div>
-          </div>
-        </div>
-
-        {editingId && <p className="st-msg cat-note">{c.form.editNote}</p>}
-        {error && <p className="st-msg st-error">{error}</p>}
-        {success && <p className="st-msg st-success">{success}</p>}
-
-        <div className="st-actions">
-          {editingId && (
-            <button type="button" className="st-reset" onClick={resetForm}>
-              {c.form.cancel}
+          <div className="st-actions">
+            {editingId && (
+              <button type="button" className="st-reset" onClick={resetForm}>
+                {c.form.cancel}
+              </button>
+            )}
+            <button type="submit" className="st-submit" disabled={saving}>
+              {saving
+                ? c.form.saving
+                : editingId
+                ? c.form.update
+                : c.form.create}
             </button>
-          )}
-          <button type="submit" className="st-submit" disabled={saving}>
-            {saving
-              ? c.form.saving
-              : editingId
-              ? c.form.update
-              : c.form.create}
-          </button>
-        </div>
-      </form>
+          </div>
+        </form>
+      )}
 
-      <div className="st-card st-list">
+      <div className={`st-card ${isAdmin ? "st-list" : ""}`}>
         <h3 className="st-card-title">{c.list.title}</h3>
 
         <form className="cat-toolbar pr-toolbar" onSubmit={handleSearch}>
@@ -307,7 +305,7 @@ const Variants = () => {
               <table className="st-tbl va-tbl">
                 <thead>
                   <tr>
-                    {COLUMNS.map((col) => (
+                    {columns.map((col) => (
                       <th key={col}>{col}</th>
                     ))}
                   </tr>
@@ -315,7 +313,7 @@ const Variants = () => {
                 <tbody>
                   {list.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={COLUMNS.length} className="st-empty">
+                      <td colSpan={columns.length} className="st-empty">
                         {c.list.empty}
                       </td>
                     </tr>
@@ -335,26 +333,28 @@ const Variants = () => {
                             {v.isActive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td>
-                          <div className="cat-actions">
-                            <button
-                              type="button"
-                              className="cat-edit"
-                              onClick={() => handleEdit(v)}
-                            >
-                              {c.list.edit}
-                            </button>
-                            {v.isActive && (
+                        {isAdmin && (
+                          <td>
+                            <div className="cat-actions">
                               <button
                                 type="button"
-                                className="st-deact"
-                                onClick={() => handleDeactivate(v.id)}
+                                className="cat-edit"
+                                onClick={() => handleEdit(v)}
                               >
-                                {c.list.deactivate}
+                                {c.list.edit}
                               </button>
-                            )}
-                          </div>
-                        </td>
+                              {v.isActive && (
+                                <button
+                                  type="button"
+                                  className="st-deact"
+                                  onClick={() => handleDeactivate(v.id)}
+                                >
+                                  {c.list.deactivate}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}

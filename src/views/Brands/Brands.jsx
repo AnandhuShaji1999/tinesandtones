@@ -7,9 +7,15 @@ import {
   updateBrand,
   deactivateBrand,
 } from "../../controllers/brandController";
+import { useIsAdmin } from "../../hooks/useIsAdmin";
 
 const Brands = () => {
   const c = BRAND_CONTENT;
+  const isAdmin = useIsAdmin();
+
+  // The last column is the Actions column; only the admin sees it
+  const columns = isAdmin ? c.list.columns : c.list.columns.slice(0, -1);
+
   const [name, setName] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -100,47 +106,49 @@ const Brands = () => {
       <h2 className="st-title">{c.title}</h2>
       <p className="st-subtitle">{c.subtitle}</p>
 
-      <form className="st-card" onSubmit={handleSubmit}>
-        <h3 className="st-card-title">
-          {editingId ? <Pencil size={18} /> : <Plus size={18} />}
-          {editingId ? c.form.editTitle : c.form.createTitle}
-        </h3>
+      {isAdmin && (
+        <form className="st-card" onSubmit={handleSubmit}>
+          <h3 className="st-card-title">
+            {editingId ? <Pencil size={18} /> : <Plus size={18} />}
+            {editingId ? c.form.editTitle : c.form.createTitle}
+          </h3>
 
-        <div className="cat-form-row">
-          <div className="f-field">
-            <label>{c.form.name.label}</label>
-            <div className="f-control">
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={c.form.name.placeholder}
-                required
-              />
+          <div className="cat-form-row">
+            <div className="f-field">
+              <label>{c.form.name.label}</label>
+              <div className="f-control">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={c.form.name.placeholder}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="cat-form-btns">
+              {editingId && (
+                <button type="button" className="st-reset" onClick={resetForm}>
+                  {c.form.cancel}
+                </button>
+              )}
+              <button type="submit" className="st-submit" disabled={saving}>
+                {saving
+                  ? c.form.saving
+                  : editingId
+                  ? c.form.update
+                  : c.form.create}
+              </button>
             </div>
           </div>
 
-          <div className="cat-form-btns">
-            {editingId && (
-              <button type="button" className="st-reset" onClick={resetForm}>
-                {c.form.cancel}
-              </button>
-            )}
-            <button type="submit" className="st-submit" disabled={saving}>
-              {saving
-                ? c.form.saving
-                : editingId
-                ? c.form.update
-                : c.form.create}
-            </button>
-          </div>
-        </div>
+          {error && <p className="st-msg st-error">{error}</p>}
+          {success && <p className="st-msg st-success">{success}</p>}
+        </form>
+      )}
 
-        {error && <p className="st-msg st-error">{error}</p>}
-        {success && <p className="st-msg st-success">{success}</p>}
-      </form>
-
-      <div className="st-card st-list">
+      <div className={`st-card ${isAdmin ? "st-list" : ""}`}>
         <h3 className="st-card-title">{c.list.title}</h3>
 
         <form className="cat-toolbar" onSubmit={handleSearch}>
@@ -176,7 +184,7 @@ const Brands = () => {
               <table className="st-tbl cat-tbl">
                 <thead>
                   <tr>
-                    {c.list.columns.map((col) => (
+                    {columns.map((col) => (
                       <th key={col}>{col}</th>
                     ))}
                   </tr>
@@ -184,7 +192,7 @@ const Brands = () => {
                 <tbody>
                   {list.rows.length === 0 ? (
                     <tr>
-                      <td colSpan={c.list.columns.length} className="st-empty">
+                      <td colSpan={columns.length} className="st-empty">
                         {c.list.empty}
                       </td>
                     </tr>
@@ -202,26 +210,28 @@ const Brands = () => {
                             {brand.isActive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td>
-                          <div className="cat-actions">
-                            <button
-                              type="button"
-                              className="cat-edit"
-                              onClick={() => handleEdit(brand)}
-                            >
-                              {c.list.edit}
-                            </button>
-                            {brand.isActive && (
+                        {isAdmin && (
+                          <td>
+                            <div className="cat-actions">
                               <button
                                 type="button"
-                                className="st-deact"
-                                onClick={() => handleDeactivate(brand.id)}
+                                className="cat-edit"
+                                onClick={() => handleEdit(brand)}
                               >
-                                {c.list.deactivate}
+                                {c.list.edit}
                               </button>
-                            )}
-                          </div>
-                        </td>
+                              {brand.isActive && (
+                                <button
+                                  type="button"
+                                  className="st-deact"
+                                  onClick={() => handleDeactivate(brand.id)}
+                                >
+                                  {c.list.deactivate}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
