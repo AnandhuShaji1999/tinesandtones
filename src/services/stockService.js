@@ -20,14 +20,6 @@ export const getBatch = async (id) => {
   return data;
 };
 
-export const patchBatch = async (id, payload) => {
-  const { data } = await axiosInstance.patch(
-    API_ENDPOINTS.STOCK.BATCH(id),
-    payload
-  );
-  return data;
-};
-
 export const getLedger = async (params) => {
   const { data } = await axiosInstance.get(API_ENDPOINTS.STOCK.LEDGER, {
     params,
