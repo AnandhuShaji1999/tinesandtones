@@ -19,6 +19,20 @@ export const loadReport = async (name, filters, page = 1) => {
   }
 };
 
+// An export asks for a file, so an error body also arrives as a blob: read it
+const readBlobError = async (err) => {
+  const body = err?.response?.data;
+  if (body instanceof Blob) {
+    try {
+      const parsed = JSON.parse(await body.text());
+      return { ...err, response: { ...err.response, data: parsed } };
+    } catch {
+      return err;
+    }
+  }
+  return err;
+};
+
 // format: "csv" | "xlsx"
 export const exportReport = async (name, filters, format) => {
   try {
@@ -34,6 +48,7 @@ export const exportReport = async (name, filters, format) => {
     a.click();
     URL.revokeObjectURL(url);
   } catch (err) {
-    throw new Error(parseApiError(err, "Could not export the report"));
+    const fixed = await readBlobError(err);
+    throw new Error(parseApiError(fixed, "Could not export the report"));
   }
 };

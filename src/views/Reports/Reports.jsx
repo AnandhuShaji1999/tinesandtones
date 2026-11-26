@@ -15,8 +15,10 @@ import {
   columnsOf,
   formatCell,
   humanize,
+  pageList,
+  statusClass,
+  visibleColumns,
 } from "../../models/reportModel";
-import { pageList } from "../../models/exchangeModel";
 import { exportReport, loadReport } from "../../controllers/reportController";
 import { listBranches } from "../../controllers/staffController";
 
@@ -58,6 +60,7 @@ const Reports = () => {
     [branches]
   );
 
+  // Text filter on the loaded page only
   const rows = useMemo(() => {
     if (!data) return [];
     const t = q.trim().toLowerCase();
@@ -67,7 +70,10 @@ const Reports = () => {
     );
   }, [data, q]);
 
-  const cols = useMemo(() => columnsOf(data?.rows || []), [data]);
+  const cols = useMemo(
+    () => visibleColumns(tab, columnsOf(data?.rows || [])),
+    [tab, data]
+  );
 
   const changeTab = (t) => {
     setTab(t);
@@ -90,6 +96,18 @@ const Reports = () => {
     } finally {
       setExporting("");
     }
+  };
+
+  const cell = (k, r) => {
+    if (k === "status") {
+      return (
+        <span className={`sl-pill ${statusClass(r[k])}`}>
+          <i />
+          {formatCell(k, r[k], branchMap)}
+        </span>
+      );
+    }
+    return formatCell(k, r[k], branchMap);
   };
 
   const hasBranches = branches.length > 0;
@@ -249,7 +267,7 @@ const Reports = () => {
                       <tr key={i}>
                         <td>{(page - 1) * REPORT_PAGE_SIZE + i + 1}</td>
                         {cols.map((k) => (
-                          <td key={k}>{formatCell(k, r[k], branchMap)}</td>
+                          <td key={k}>{cell(k, r)}</td>
                         ))}
                       </tr>
                     ))
