@@ -9,6 +9,39 @@ import {
   lookupBarcode,
 } from "../../controllers/productController";
 
+// A3 print setup (297mm x 420mm). Only active while this page is mounted.
+const A3_PRINT_CSS = `
+@media screen {
+  .bc-sheet {
+    max-width: 297mm;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media print {
+  @page {
+    size: A3 portrait;
+    margin: 10mm;
+  }
+  html, body {
+    width: 297mm;
+    margin: 0;
+    padding: 0;
+  }
+  .bc-sheet {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    display: grid;
+    gap: 4mm;
+  }
+  .bc-label {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+`;
+
 const Barcodes = () => {
   const c = BARCODE_CONTENT;
   const panelRef = useRef(null);
@@ -106,6 +139,9 @@ const Barcodes = () => {
 
   return (
     <div className="st-page">
+      {/* A3 page size for printing */}
+      <style>{A3_PRINT_CSS}</style>
+
       <div className="bc-noprint">
         <h2 className="st-title">{c.title}</h2>
         <p className="st-subtitle">{c.subtitle}</p>
